@@ -63,7 +63,7 @@ body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);m
 .nav-lang{font-size:11px;font-weight:700;color:var(--text3);cursor:pointer;background:var(--green-light);border:none;padding:6px 12px;border-radius:8px;font-family:'Nunito',sans-serif}
 
 /* ── HOME SCREEN ── */
-#screen-home{padding-top:70px}
+#screen-home{padding-top:0}
 .home-header{background:linear-gradient(135deg,#1a3d28 0%,#2d7a4f 100%);padding:28px 20px 36px;position:relative;overflow:hidden}
 .home-header::after{content:'';position:absolute;bottom:-20px;left:0;right:0;height:40px;background:var(--cream);border-radius:20px 20px 0 0}
 .home-greeting{color:rgba(255,255,255,.75);font-size:13px;margin-bottom:4px}
@@ -557,15 +557,15 @@ tr:hover td{background:#f8fdf9}
 
 <!-- BOTTOM NAV -->
 <div id="bottom-nav">
-  <button class="bnav-item" onclick="goScreen('screen-home')" id="bnav-home">
+  <button class="bnav-item" onclick="goTab('screen-home')" id="bnav-home">
     <span class="bnav-icon">🏠</span>
     <span class="bnav-label" id="bnav-home-label">Beranda</span>
   </button>
-  <button class="bnav-item" onclick="goScreen('screen-f5')" id="bnav-fb">
+  <button class="bnav-item" onclick="goTab('screen-f5')" id="bnav-fb">
     <span class="bnav-icon">💬</span>
     <span class="bnav-label">Feedback</span>
   </button>
-  <button class="bnav-item" onclick="goScreen('screen-f7')" id="bnav-akun">
+  <button class="bnav-item" onclick="goTab('screen-f7')" id="bnav-akun">
     <span class="bnav-icon">👤</span>
     <span class="bnav-label" id="bnav-akun-label">Akun</span>
   </button>
@@ -658,6 +658,20 @@ function toast(msg, dur=2500) {
 }
 
 // ── SCREEN NAV ──
+// goTab: bottom nav — reset semua screen, tidak pakai stack
+function goTab(id) {
+  if(document.querySelector('.screen.active')?.id === id) return;
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active', 'prev');
+  });
+  screenStack = [];
+  const next = document.getElementById(id);
+  next.classList.add('active');
+  updateNavbar(id);
+  onScreenEnter(id);
+}
+
+// goScreen: navigasi dalam app (push stack, animasi slide)
 function goScreen(id) {
   const current = document.querySelector('.screen.active');
   if(current && current.id === id) return;
@@ -678,6 +692,7 @@ function goBack() {
   const current = document.querySelector('.screen.active');
   const prevId = screenStack.pop();
   current.classList.remove('active');
+  current.classList.remove('prev');
   const prev = document.getElementById(prevId);
   prev.classList.remove('prev');
   prev.classList.add('active');

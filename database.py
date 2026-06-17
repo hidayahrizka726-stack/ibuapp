@@ -1,4 +1,5 @@
 import os
+import bcrypt
 import psycopg
 from psycopg.rows import dict_row
 
@@ -59,8 +60,7 @@ def init_db():
     cur.execute("SELECT COUNT(*) as c FROM users WHERE role='admin'")
     row = cur.fetchone()
     if row['c'] == 0:
-        from passlib.hash import bcrypt
-        hashed = bcrypt.hash("admin123")
+        hashed = bcrypt.hashpw(b"admin123", bcrypt.gensalt()).decode()
         cur.execute(
             "INSERT INTO users (nama, sandi_hash, role) VALUES (%s, %s, 'admin')",
             ("Admin", hashed)

@@ -1,7 +1,7 @@
 import os
+import bcrypt
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
-from passlib.hash import bcrypt
 from fastapi import HTTPException, Depends, Cookie
 from typing import Optional
 
@@ -10,10 +10,10 @@ ALGORITHM = "HS256"
 TOKEN_EXPIRE_HOURS = 24
 
 def hash_password(password: str) -> str:
-    return bcrypt.hash(password)
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
 def verify_password(password: str, hashed: str) -> bool:
-    return bcrypt.verify(password, hashed)
+    return bcrypt.checkpw(password.encode(), hashed.encode())
 
 def create_token(user_id: int, nama: str, role: str) -> str:
     expire = datetime.utcnow() + timedelta(hours=TOKEN_EXPIRE_HOURS)

@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>ArdiyaMidly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --green:#2d7a4f;--green2:#3ea068;--green-light:#e8f5ee;--green-pale:#f0faf4;
+  --orange:#e07c2a;--orange-light:#fef3e8;--cream:#fdf8f0;--cream2:#f7efe0;
+  --text:#1a2e1f;--text2:#4a6550;--text3:#8aab90;
+  --white:#ffffff;--shadow:0 4px 20px rgba(45,122,79,.12);
+  --radius:18px;--radius-sm:12px;
+  font-size:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);min-height:100dvh;overflow-x:hidden}
+
+/* ── TOAST ── */
+#toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:#1a2e1f;color:#fff;padding:12px 24px;border-radius:99px;font-size:14px;font-weight:600;z-index:9999;transition:transform .3s;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── SCREENS ── */
+.screen{position:fixed;inset:0;background:var(--cream);overflow-y:auto;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);z-index:10}
+.screen.active{transform:translateX(0)}
+.screen.prev{transform:translateX(-30%)}
+
+/* ── SPLASH ── */
+#screen-splash{background:linear-gradient(160deg,#1a3d28 0%,#2d7a4f 60%,#3ea068 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:100}
+.splash-logo{width:100px;height:100px;background:rgba(255,255,255,.15);border-radius:28px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:42px;color:#fff;font-weight:700;border:2px solid rgba(255,255,255,.3)}
+.splash-name{font-family:'Playfair Display',serif;font-size:32px;color:#fff;font-weight:700;letter-spacing:.5px}
+.splash-tagline{color:rgba(255,255,255,.8);font-size:14px;text-align:center;padding:0 32px;line-height:1.6}
+.splash-lang{display:flex;gap:8px;margin-top:8px}
+.splash-lang button{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);color:#fff;padding:8px 20px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif}
+.splash-lang button.active{background:#fff;color:var(--green)}
+
+/* ── LOGIN SCREEN ── */
+#screen-login{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:linear-gradient(160deg,#1a3d28 0%,#2d7a4f 100%)}
+.login-card{background:#fff;border-radius:24px;padding:32px 24px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo .logo-icon{width:64px;height:64px;background:var(--green-light);border-radius:18px;display:inline-flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:28px;color:var(--green);margin-bottom:10px}
+.login-logo h1{font-family:'Playfair Display',serif;font-size:22px;color:var(--text)}
+.login-logo p{font-size:12px;color:var(--text3);margin-top:4px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;font-weight:700;color:var(--text2);margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:12px 16px;border:2px solid #e8f0eb;border-radius:12px;font-size:15px;font-family:'Nunito',sans-serif;color:var(--text);background:#fafffe;outline:none;transition:border .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--green)}
+.form-group textarea{resize:vertical;min-height:80px}
+.btn-primary{width:100%;background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;border:none;padding:14px;border-radius:14px;font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;letter-spacing:.3px}
+.btn-secondary{background:var(--green-light);color:var(--green);border:none;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer}
+.btn-danger{background:#fff0f0;color:#c0392b;border:1px solid #f5c6c6;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer}
+.btn-orange{background:linear-gradient(135deg,#e07c2a,#f09340);color:#fff;border:none;padding:10px 20px;border-radius:12px;font-size:13px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer}
+.login-footer{text-align:center;margin-top:16px;font-size:12px;color:var(--text3)}
+
+/* ── NAVBAR ── */
+#navbar{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(253,248,240,.95);backdrop-filter:blur(10px);border-bottom:1px solid rgba(45,122,79,.12);padding:12px 20px;display:none;align-items:center;gap:12px}
+#navbar.visible{display:flex}
+.nav-back{width:36px;height:36px;background:var(--green-light);border:none;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.nav-back svg{width:18px;height:18px;stroke:var(--green);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.nav-title{font-weight:800;font-size:16px;color:var(--text);flex:1}
+.nav-lang{font-size:11px;font-weight:700;color:var(--text3);cursor:pointer;background:var(--green-light);border:none;padding:6px 12px;border-radius:8px;font-family:'Nunito',sans-serif}
+
+/* ── HOME SCREEN ── */
+#screen-home{padding-top:70px}
+.home-header{background:linear-gradient(135deg,#1a3d28 0%,#2d7a4f 100%);padding:28px 20px 36px;position:relative;overflow:hidden}
+.home-header::after{content:'';position:absolute;bottom:-20px;left:0;right:0;height:40px;background:var(--cream);border-radius:20px 20px 0 0}
+.home-greeting{color:rgba(255,255,255,.75);font-size:13px;margin-bottom:4px}
+.home-title{font-family:'Playfair Display',serif;color:#fff;font-size:24px;font-weight:700;line-height:1.2}
+.home-subtitle{color:rgba(255,255,255,.65);font-size:12px;margin-top:6px}
+.home-role-badge{display:inline-block;background:rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:99px;margin-top:8px;border:1px solid rgba(255,255,255,.3)}
+
+.features-grid{padding:24px 16px 100px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.feature-card{background:#fff;border-radius:var(--radius);padding:20px 16px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;border:2px solid transparent}
+.feature-card:active{transform:scale(.97)}
+.feature-card::before{content:'';position:absolute;top:0;right:0;width:60px;height:60px;border-radius:0 var(--radius) 0 60px;opacity:.1}
+.feature-card.green::before{background:var(--green)}
+.feature-card.orange::before{background:var(--orange)}
+.feature-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:12px}
+.feature-icon.green{background:var(--green-light)}
+.feature-icon.orange{background:var(--orange-light)}
+.feature-num{font-size:10px;font-weight:800;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.feature-name{font-size:13px;font-weight:800;color:var(--text);line-height:1.3}
+.feature-name-en{font-size:11px;color:var(--text3);margin-top:2px;font-style:italic}
+
+/* ── BOTTOM NAV ── */
+#bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid rgba(45,122,79,.12);display:none;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:50}
+#bottom-nav.visible{display:flex;justify-content:space-around}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;border:none;background:none;font-family:'Nunito',sans-serif}
+.bnav-icon{font-size:22px;line-height:1}
+.bnav-label{font-size:10px;font-weight:700;color:var(--text3)}
+.bnav-item.active .bnav-label{color:var(--green)}
+
+/* ── FEATURE SCREEN ── */
+.feature-header{padding:80px 20px 20px;background:linear-gradient(135deg,#1a3d28,#2d7a4f);position:sticky;top:0;z-index:5}
+.feature-header.orange-grad{background:linear-gradient(135deg,#8b4510,#e07c2a)}
+.feature-header h2{font-family:'Playfair Display',serif;color:#fff;font-size:22px;font-weight:700}
+.feature-header p{color:rgba(255,255,255,.75);font-size:13px;margin-top:6px;line-height:1.5}
+.feature-body{padding:20px 16px 100px}
+
+/* ── VIDEO CARDS ── */
+.video-list{display:flex;flex-direction:column;gap:16px}
+.video-card{background:#fff;border-radius:var(--radius-sm);overflow:hidden;box-shadow:var(--shadow)}
+.video-thumb-area{background:linear-gradient(135deg,#1a3d28,#3ea068);padding:20px;display:flex;align-items:center;gap:16px;cursor:pointer}
+.video-thumb-area.orange-bg{background:linear-gradient(135deg,#8b4510,#e07c2a)}
+.video-play-btn{width:52px;height:52px;background:rgba(255,255,255,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid rgba(255,255,255,.5)}
+.video-play-btn svg{width:22px;height:22px;fill:#fff;margin-left:3px}
+.video-info-top{flex:1}
+.video-title-card{font-size:15px;font-weight:800;color:#fff;line-height:1.2}
+.video-title-en{font-size:12px;color:rgba(255,255,255,.7);font-style:italic;margin-top:2px}
+.video-dur{display:inline-block;background:rgba(0,0,0,.25);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;margin-top:6px}
+.video-player-wrap{display:none;padding:0}
+.video-player-wrap.open{display:block}
+.video-player-wrap video{width:100%;max-height:260px;background:#000;display:block}
+.video-admin-bar{padding:12px 16px;display:flex;justify-content:flex-end}
+
+/* ── DESCRIPTION BOX ── */
+.desc-box{background:var(--green-light);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px;border-left:4px solid var(--green)}
+.desc-box.orange{background:var(--orange-light);border-left-color:var(--orange)}
+.desc-box p{font-size:14px;color:var(--text2);line-height:1.6}
+
+/* ── TABLE ── */
+.data-table-wrap{overflow-x:auto;border-radius:var(--radius-sm);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;background:#fff;font-size:13px;min-width:500px}
+th{background:var(--green);color:#fff;padding:12px 14px;text-align:left;font-weight:700;font-size:12px;white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid #f0f5f2;vertical-align:top}
+tr:last-child td{border:none}
+tr:hover td{background:#f8fdf9}
+.action-btns{display:flex;gap:6px;white-space:nowrap}
+
+/* ── GALLERY ── */
+.gallery-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.gallery-item{background:#fff;border-radius:var(--radius-sm);overflow:hidden;box-shadow:var(--shadow)}
+.gallery-img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.gallery-desc-area{padding:10px 12px}
+.gallery-desc-text{font-size:12px;color:var(--text2);line-height:1.4;margin-bottom:8px}
+.gallery-actions{display:flex;gap:6px}
+
+/* ── FEEDBACK ── */
+.feedback-list{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.feedback-card{background:#fff;border-radius:var(--radius-sm);padding:16px;box-shadow:var(--shadow)}
+.feedback-name{font-weight:800;color:var(--green);font-size:14px;margin-bottom:8px}
+.feedback-field{margin-bottom:6px}
+.feedback-field span{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:2px}
+.feedback-field p{font-size:13px;color:var(--text2);line-height:1.5}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-sheet{background:#fff;border-radius:24px 24px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding:24px 20px 40px}
+.modal-handle{width:40px;height:4px;background:#e0e0e0;border-radius:2px;margin:0 auto 20px}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:20px;font-weight:700}
+
+/* ── SLIDESHOW (Description) ── */
+.slideshow{position:relative;overflow:hidden;border-radius:var(--radius-sm);margin-bottom:20px}
+.slide{display:none;padding:20px;background:#fff;box-shadow:var(--shadow)}
+.slide.active{display:block}
+.slide-lang{font-size:10px;font-weight:800;letter-spacing:1px;color:var(--text3);margin-bottom:8px;text-transform:uppercase}
+.slide-text{font-size:15px;line-height:1.7;color:var(--text2)}
+.slide-nav{display:flex;justify-content:center;gap:8px;margin-top:12px}
+.slide-dot{width:8px;height:8px;border-radius:50%;background:#ddd;border:none;cursor:pointer}
+.slide-dot.active{background:var(--green);width:20px;border-radius:4px}
+
+/* ── QR SCREEN ── */
+#screen-qr{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px}
+#qr-img{width:220px;height:220px;border:4px solid var(--green);border-radius:16px;margin:20px 0}
+
+/* ── USERS ── */
+.user-list{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.user-card{background:#fff;border-radius:var(--radius-sm);padding:14px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.user-avatar{width:40px;height:40px;border-radius:12px;background:var(--green-light);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--green);font-size:16px;flex-shrink:0}
+.user-info{flex:1}
+.user-name{font-weight:800;font-size:14px}
+.role-badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:800}
+.role-badge.admin{background:var(--green-light);color:var(--green)}
+.role-badge.viewer{background:var(--orange-light);color:var(--orange)}
+
+/* ── UPLOAD PROGRESS ── */
+.upload-progress{display:none;height:4px;background:#e0e0e0;border-radius:2px;overflow:hidden;margin-top:8px}
+.upload-progress.show{display:block}
+.upload-bar{height:100%;background:var(--green);width:0%;transition:width .3s;border-radius:2px}
+
+/* ── SECTION TITLE ── */
+.section-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--text);margin-bottom:14px;font-weight:700}
+.section-subtitle{font-size:13px;color:var(--text3);margin-bottom:16px;margin-top:-10px}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:90px;right:20px;width:52px;height:52px;background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;border:none;border-radius:50%;font-size:24px;cursor:pointer;box-shadow:0 6px 20px rgba(45,122,79,.4);z-index:40;display:none;align-items:center;justify-content:center;font-family:'Nunito',sans-serif}
+.fab.visible{display:flex}
+
+/* ── LOGOUT CONFIRM ── */
+.exit-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:none;align-items:center;justify-content:center;padding:24px}
+.exit-overlay.open{display:flex}
+.exit-card{background:#fff;border-radius:24px;padding:28px 24px;width:100%;max-width:320px;text-align:center}
+.exit-card h3{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:8px}
+.exit-card p{font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.5}
+.exit-btns{display:flex;gap:10px}
+.exit-btns button{flex:1;padding:12px;border-radius:12px;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer}
+.exit-cancel{background:var(--green-light);color:var(--green);border:none}
+.exit-confirm{background:#c0392b;color:#fff;border:none}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- SPLASH -->
+<div class="screen active" id="screen-splash">
+  <div class="splash-logo">A</div>
+  <div class="splash-name">ArdiyaMidly</div>
+  <p class="splash-tagline" id="splash-tagline">A Mindful Companion For Postpartum Moms<br>Teman Setia Ibu Pasca Melahirkan</p>
+  <div class="splash-lang">
+    <button onclick="setLang('id')" id="btn-id">🇮🇩 Indonesia</button>
+    <button onclick="setLang('en')" id="btn-en">🇬🇧 English</button>
+  </div>
+  <button class="btn-primary" style="margin-top:24px;width:200px;border-radius:99px" onclick="goLogin()">Mulai / Start →</button>
+</div>
+
+<!-- LOGIN -->
+<div class="screen" id="screen-login">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">A</div>
+      <h1>ArdiyaMidly</h1>
+      <p id="login-sub">Masuk ke aplikasi / Sign in</p>
+    </div>
+    <div class="form-group">
+      <label id="label-nama">Nama</label>
+      <input type="text" id="login-nama" placeholder="Masukkan nama..."/>
+    </div>
+    <div class="form-group">
+      <label id="label-sandi">Sandi</label>
+      <input type="password" id="login-sandi" placeholder="Masukkan sandi..."/>
+    </div>
+    <button class="btn-primary" onclick="doLogin()" id="btn-masuk">Masuk</button>
+    <p class="login-footer" id="login-footer">Admin default: Admin / admin123</p>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<div id="navbar">
+  <button class="nav-back" onclick="goBack()">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <span class="nav-title" id="nav-title">ArdiyaMidly</span>
+  <button class="nav-lang" onclick="toggleLang()" id="nav-lang-btn">🇮🇩 ID</button>
+</div>
+
+<!-- HOME -->
+<div class="screen" id="screen-home">
+  <div class="home-header">
+    <div class="home-greeting" id="home-greeting">Selamat datang,</div>
+    <div class="home-title" id="home-title">ArdiyaMidly 🌿</div>
+    <div class="home-subtitle" id="home-subtitle">Pilih fitur untuk memulai perjalanan mindfulness Anda</div>
+    <span class="home-role-badge" id="home-role">Admin</span>
+  </div>
+  <div class="features-grid" id="features-grid"></div>
+</div>
+
+<!-- FITUR 1: THE GENTLE BREATH -->
+<div class="screen" id="screen-f1">
+  <div class="feature-header">
+    <h2>🌬️ The Gentle Breath</h2>
+    <p id="f1-desc-sub">Afirmasi napas lembut untuk menenangkan jiwa</p>
+  </div>
+  <div class="feature-body">
+    <div class="slideshow" id="f1-slideshow">
+      <div class="slide active">
+        <div class="slide-lang">🇮🇩 Bahasa Indonesia</div>
+        <p class="slide-text">Latihan napas lembut dirancang khusus untuk ibu pasca melahirkan. Setiap sesi membantu menenangkan sistem saraf, mengurangi kecemasan, dan mengembalikan keseimbangan emosi melalui teknik pernapasan yang teruji secara ilmiah.</p>
+      </div>
+      <div class="slide">
+        <div class="slide-lang">🇬🇧 English</div>
+        <p class="slide-text">Gentle breathing exercises specially designed for postpartum mothers. Each session helps calm the nervous system, reduce anxiety, and restore emotional balance through scientifically proven breathing techniques.</p>
+      </div>
+    </div>
+    <div class="slide-nav" id="f1-dots"></div>
+    <div class="section-title" style="margin-top:20px">Video Afirmasi</div>
+    <div class="video-list" id="f1-videos"></div>
+    <div id="f1-admin-upload" style="display:none;margin-top:20px">
+      <button class="btn-secondary" onclick="openVideoUpload(1)">+ Upload Video</button>
+    </div>
+  </div>
+</div>
+
+<!-- FITUR 2: DAWN DEW & MOMS GRACE -->
+<div class="screen" id="screen-f2">
+  <div class="feature-header orange-grad">
+    <h2>🌅 Dawn Dew & Mom's Grace</h2>
+    <p id="f2-desc-sub">7 afirmasi pagi untuk memulai hari dengan penuh kasih</p>
+  </div>
+  <div class="feature-body">
+    <div class="slideshow" id="f2-slideshow">
+      <div class="slide active">
+        <div class="slide-lang">🇮🇩 Bahasa Indonesia</div>
+        <p class="slide-text">Koleksi 7 video afirmasi pagi yang dirancang untuk menyambut hari baru dengan hati terbuka. Seperti embun pagi yang menyegarkan, setiap video membawa energi positif dan penguatan diri bagi ibu yang sedang menjalani perjalanan pasca melahirkan.</p>
+      </div>
+      <div class="slide">
+        <div class="slide-lang">🇬🇧 English</div>
+        <p class="slide-text">A collection of 7 morning affirmation videos designed to welcome each new day with an open heart. Like refreshing morning dew, each video brings positive energy and self-empowerment for mothers navigating their postpartum journey.</p>
+      </div>
+    </div>
+    <div class="slide-nav" id="f2-dots"></div>
+    <div class="section-title" style="margin-top:20px">Video Afirmasi Pagi</div>
+    <div class="video-list" id="f2-videos"></div>
+    <div id="f2-admin-upload" style="display:none;margin-top:20px">
+      <button class="btn-orange" onclick="openVideoUpload(2)">+ Upload Video</button>
+    </div>
+  </div>
+</div>
+
+<!-- FITUR 3: THE SILENT EMBRACE -->
+<div class="screen" id="screen-f3">
+  <div class="feature-header">
+    <h2>🤍 The Silent Embrace of Mom's Soul</h2>
+    <p id="f3-desc-sub">Pelukan batin yang menyentuh jiwa setiap ibu</p>
+  </div>
+  <div class="feature-body">
+    <div class="slideshow" id="f3-slideshow">
+      <div class="slide active">
+        <div class="slide-lang">🇮🇩 Bahasa Indonesia</div>
+        <p class="slide-text">Sebuah pelukan batin yang diam namun penuh makna. 7 video meditasi mendalam ini hadir untuk menemani ibu dalam momen-momen sunyi, menyentuh ruang terdalam jiwa, dan mengingatkan bahwa setiap ibu adalah kekuatan yang luar biasa.</p>
+      </div>
+      <div class="slide">
+        <div class="slide-lang">🇬🇧 English</div>
+        <p class="slide-text">A silent yet deeply meaningful inner embrace. These 7 deep meditation videos are here to accompany mothers in quiet moments, touching the deepest space of the soul, and reminding every mother that she is an extraordinary force of nature.</p>
+      </div>
+    </div>
+    <div class="slide-nav" id="f3-dots"></div>
+    <div class="section-title" style="margin-top:20px">Video Meditasi Jiwa</div>
+    <div class="video-list" id="f3-videos"></div>
+    <div id="f3-admin-upload" style="display:none;margin-top:20px">
+      <button class="btn-secondary" onclick="openVideoUpload(3)">+ Upload Video</button>
+    </div>
+  </div>
+</div>
+
+<!-- FITUR 4: RESEARCH DATA -->
+<div class="screen" id="screen-f4">
+  <div class="feature-header orange-grad">
+    <h2>📊 Research Data</h2>
+    <p>Data penelitian partisipan ibu</p>
+  </div>
+  <div class="feature-body">
+    <button class="btn-primary" style="width:auto;padding:10px 20px;border-radius:12px;margin-bottom:16px" onclick="openResearchModal()">+ Tambah Data</button>
+    <div class="data-table-wrap">
+      <table>
+        <thead><tr><th>No</th><th>Nama Ibu</th><th>Pekerjaan</th><th>Yang Dirasakan</th><th>Aksi</th></tr></thead>
+        <tbody id="research-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- FITUR 5: FEEDBACK -->
+<div class="screen" id="screen-f5">
+  <div class="feature-header">
+    <h2>💬 Mom's Feedback Corner</h2>
+    <p id="f5-desc-sub">Bagikan pengalaman Anda menggunakan aplikasi ini</p>
+  </div>
+  <div class="feature-body">
+    <div class="desc-box">
+      <p id="f5-desc-text">Ceritakan pengalaman Anda selama merawat anak dan rasakan perubahan setelah menggunakan ArdiyaMidly. Setiap cerita Anda sangat berarti!</p>
+    </div>
+    <div class="section-title">Bagikan Cerita Anda</div>
+    <div class="form-group">
+      <label id="label-nama-ibu">Nama Ibu</label>
+      <input type="text" id="fb-nama" placeholder="Nama Anda..."/>
+    </div>
+    <div class="form-group">
+      <label id="label-pengalaman">Ceritakan Pengalaman Selama Menjaga Anak</label>
+      <textarea id="fb-pengalaman" rows="4" placeholder="Tuliskan cerita Anda..."></textarea>
+    </div>
+    <div class="form-group">
+      <label id="label-perasaan">Yang Dirasakan Setelah Menggunakan Aplikasi</label>
+      <textarea id="fb-perasaan" rows="3" placeholder="Apa yang Anda rasakan setelah menggunakan aplikasi ini?"></textarea>
+    </div>
+    <button class="btn-primary" onclick="submitFeedback()">Kirim Cerita 💚</button>
+    <div id="feedback-list-area" style="display:none">
+      <div class="section-title" style="margin-top:28px">Semua Cerita Ibu</div>
+      <div class="feedback-list" id="feedback-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FITUR 6: GALLERY -->
+<div class="screen" id="screen-f6">
+  <div class="feature-header orange-grad">
+    <h2>🖼️ Galeri Penelitian</h2>
+    <p>Dokumentasi visual perjalanan penelitian</p>
+  </div>
+  <div class="feature-body">
+    <div id="gallery-upload-area" style="display:none;margin-bottom:20px">
+      <label style="display:block;background:var(--green-light);border:2px dashed var(--green);border-radius:var(--radius-sm);padding:24px;text-align:center;cursor:pointer;color:var(--green);font-weight:700;font-size:14px">
+        📎 Pilih Foto atau Dokumen
+        <input type="file" id="gallery-file" accept="image/*,.pdf" style="display:none" onchange="previewGalleryUpload(event)"/>
+      </label>
+      <div id="gallery-preview" style="display:none;margin-top:12px">
+        <img id="gallery-preview-img" style="width:100%;max-height:200px;object-fit:cover;border-radius:12px;display:none"/>
+        <div class="form-group" style="margin-top:10px">
+          <label>Deskripsi Foto</label>
+          <textarea id="gallery-desc-input" rows="2" placeholder="Tambahkan deskripsi..."></textarea>
+        </div>
+        <button class="btn-primary" onclick="uploadGalleryPhoto()">Upload Foto</button>
+        <div class="upload-progress" id="gallery-progress"><div class="upload-bar" id="gallery-bar"></div></div>
+      </div>
+    </div>
+    <div class="gallery-grid" id="gallery-grid"></div>
+  </div>
+</div>
+
+<!-- FITUR 7: LOGIN / USERS (Admin) -->
+<div class="screen" id="screen-f7">
+  <div class="feature-header">
+    <h2>👤 Manajemen Akun</h2>
+    <p>Kelola pengguna Admin dan Viewer</p>
+  </div>
+  <div class="feature-body">
+    <div style="background:#fff;border-radius:var(--radius-sm);padding:16px;box-shadow:var(--shadow);margin-bottom:20px">
+      <div class="section-title">Akun Saat Ini</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="user-avatar" id="current-user-avatar">A</div>
+        <div>
+          <div style="font-weight:800;font-size:15px" id="current-user-name">Admin</div>
+          <span class="role-badge admin" id="current-user-role">Admin</span>
+        </div>
+        <button class="btn-danger" style="margin-left:auto" onclick="showExitConfirm()">Keluar</button>
+      </div>
+    </div>
+    <div class="section-title">Tambah Akun</div>
+    <div style="background:#fff;border-radius:var(--radius-sm);padding:16px;box-shadow:var(--shadow);margin-bottom:20px">
+      <div class="form-group">
+        <label>Nama</label>
+        <input type="text" id="new-user-nama" placeholder="Nama akun baru..."/>
+      </div>
+      <div class="form-group">
+        <label>Sandi</label>
+        <input type="password" id="new-user-sandi" placeholder="Sandi..."/>
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select id="new-user-role">
+          <option value="viewer">Viewer — Hanya Feedback</option>
+          <option value="admin">Admin — Akses Penuh</option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="addUser()">Tambah Akun</button>
+    </div>
+    <div class="section-title">Daftar Pengguna</div>
+    <div class="user-list" id="user-list"></div>
+    <div style="margin-top:20px;text-align:center">
+      <button class="btn-secondary" onclick="goScreen('screen-qr')">📱 Lihat QR Code Aplikasi</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR SCREEN -->
+<div class="screen" id="screen-qr">
+  <div style="text-align:center;padding:80px 24px">
+    <div class="section-title">QR Code Aplikasi</div>
+    <p style="color:var(--text3);font-size:13px;margin-bottom:16px">Scan untuk membuka ArdiyaMidly</p>
+    <img id="qr-img" src="" alt="QR Code" style="width:220px;height:220px;border:4px solid var(--green);border-radius:16px"/>
+    <p style="margin-top:16px;font-size:12px;color:var(--text3)">Atau bagikan link:</p>
+    <div style="background:var(--green-light);border-radius:10px;padding:10px 16px;margin-top:8px;word-break:break-all;font-size:12px;color:var(--green);font-weight:700" id="app-url"></div>
+    <button class="btn-secondary" style="margin-top:12px" onclick="copyUrl()">📋 Salin Link</button>
+  </div>
+</div>
+
+<!-- MODALS -->
+<!-- Video Upload Modal -->
+<div class="modal-overlay" id="modal-video-upload">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Upload Video</div>
+    <div class="form-group">
+      <label>Judul (Indonesia)</label>
+      <input type="text" id="v-judul" placeholder="Judul video..."/>
+    </div>
+    <div class="form-group">
+      <label>Judul (English)</label>
+      <input type="text" id="v-judul-en" placeholder="Video title..."/>
+    </div>
+    <div class="form-group">
+      <label>Durasi</label>
+      <input type="text" id="v-durasi" placeholder="misal: 11 Menit / 11 Minutes"/>
+    </div>
+    <div class="form-group">
+      <label>Urutan</label>
+      <input type="number" id="v-urutan" value="1" min="1"/>
+    </div>
+    <div class="form-group">
+      <label>File Video (MP4/WebM)</label>
+      <input type="file" id="v-file" accept="video/mp4,video/webm,video/quicktime"/>
+    </div>
+    <div class="upload-progress" id="video-progress"><div class="upload-bar" id="video-bar"></div></div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn-primary" onclick="submitVideoUpload()" style="flex:1">Upload</button>
+      <button class="btn-secondary" onclick="closeModal('modal-video-upload')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Research Modal -->
+<div class="modal-overlay" id="modal-research">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-research-title">Tambah Data Ibu</div>
+    <input type="hidden" id="research-edit-id"/>
+    <div class="form-group">
+      <label>Nama Ibu</label>
+      <input type="text" id="r-nama" placeholder="Nama ibu..."/>
+    </div>
+    <div class="form-group">
+      <label>Pekerjaan</label>
+      <input type="text" id="r-pekerjaan" placeholder="Pekerjaan..."/>
+    </div>
+    <div class="form-group">
+      <label>Yang Dirasakan</label>
+      <textarea id="r-dirasakan" rows="4" placeholder="Ceritakan apa yang dirasakan..."></textarea>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn-primary" onclick="submitResearch()" style="flex:1">Simpan</button>
+      <button class="btn-secondary" onclick="closeModal('modal-research')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Gallery Edit Modal -->
+<div class="modal-overlay" id="modal-gallery-edit">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Edit Deskripsi</div>
+    <input type="hidden" id="gallery-edit-id"/>
+    <div class="form-group">
+      <label>Deskripsi Foto</label>
+      <textarea id="gallery-edit-desc" rows="4"></textarea>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn-primary" onclick="submitGalleryEdit()" style="flex:1">Simpan</button>
+      <button class="btn-secondary" onclick="closeModal('modal-gallery-edit')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Exit Confirm -->
+<div class="exit-overlay" id="exit-overlay">
+  <div class="exit-card">
+    <h3>Keluar Aplikasi? 🌿</h3>
+    <p>Apakah Anda yakin ingin keluar dari ArdiyaMidly?<br><em>Are you sure you want to sign out?</em></p>
+    <div class="exit-btns">
+      <button class="exit-cancel" onclick="closeExit()">Batal</button>
+      <button class="exit-confirm" onclick="doLogout()">Keluar</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div id="bottom-nav">
+  <button class="bnav-item" onclick="goScreen('screen-home')" id="bnav-home">
+    <span class="bnav-icon">🏠</span>
+    <span class="bnav-label" id="bnav-home-label">Beranda</span>
+  </button>
+  <button class="bnav-item" onclick="goScreen('screen-f5')" id="bnav-fb">
+    <span class="bnav-icon">💬</span>
+    <span class="bnav-label">Feedback</span>
+  </button>
+  <button class="bnav-item" onclick="goScreen('screen-f7')" id="bnav-akun">
+    <span class="bnav-icon">👤</span>
+    <span class="bnav-label" id="bnav-akun-label">Akun</span>
+  </button>
+</div>
+
+<script>
+const API = '';
+let currentUser = null;
+let lang = localStorage.getItem('lang') || 'id';
+let screenStack = [];
+let currentVideoFitur = 1;
+
+// ── I18N ──
+const T = {
+  id: {
+    greeting: 'Selamat datang,',
+    homeTitle: 'ArdiyaMidly 🌿',
+    homeSub: 'Pilih fitur untuk memulai perjalanan mindfulness Anda',
+    navHome: 'Beranda', navAkun: 'Akun',
+    loginSub: 'Masuk ke aplikasi',
+    labelNama: 'Nama', labelSandi: 'Sandi', btnMasuk: 'Masuk',
+    loginFooter: 'Admin default: Admin / admin123',
+    f5Sub: 'Bagikan pengalaman Anda menggunakan aplikasi ini',
+    f5Desc: 'Ceritakan pengalaman Anda selama merawat anak dan rasakan perubahan setelah menggunakan ArdiyaMidly. Setiap cerita Anda sangat berarti!',
+    labelNamaIbu: 'Nama Ibu', labelPengalaman: 'Ceritakan Pengalaman Selama Menjaga Anak',
+    labelPerasaan: 'Yang Dirasakan Setelah Menggunakan Aplikasi',
+  },
+  en: {
+    greeting: 'Welcome,',
+    homeTitle: 'ArdiyaMidly 🌿',
+    homeSub: 'Choose a feature to begin your mindfulness journey',
+    navHome: 'Home', navAkun: 'Account',
+    loginSub: 'Sign in to the app',
+    labelNama: 'Name', labelSandi: 'Password', btnMasuk: 'Sign In',
+    loginFooter: 'Default admin: Admin / admin123',
+    f5Sub: 'Share your experience using this app',
+    f5Desc: 'Tell us about your experience caring for your child and the changes you felt after using ArdiyaMidly. Every story matters!',
+    labelNamaIbu: "Mother's Name", labelPengalaman: 'Your Experience Caring for Your Child',
+    labelPerasaan: 'How You Feel After Using the App',
+  }
+};
+
+const FEATURES = [
+  { id:1, screen:'screen-f1', icon:'🌬️', nameId:'The Gentle Breath', nameEn:'The Gentle Breath', color:'green', subId:'3 Video Afirmasi Napas', subEn:'3 Breathing Affirmations' },
+  { id:2, screen:'screen-f2', icon:'🌅', nameId:"Dawn Dew & Mom's Grace", nameEn:"Dawn Dew & Mom's Grace", color:'orange', subId:'7 Video Afirmasi Pagi', subEn:'7 Morning Affirmations' },
+  { id:3, screen:'screen-f3', icon:'🤍', nameId:"The Silent Embrace", nameEn:"Silent Embrace of Mom's Soul", color:'green', subId:'7 Video Meditasi Jiwa', subEn:'7 Soul Meditation Videos' },
+  { id:4, screen:'screen-f4', icon:'📊', nameId:'Research Data', nameEn:'Research Data', color:'orange', subId:'Data Penelitian Ibu', subEn:'Research Participant Data', adminOnly:true },
+  { id:5, screen:'screen-f5', icon:'💬', nameId:"Mom's Feedback", nameEn:"Mom's Feedback Corner", color:'green', subId:'Cerita & Pengalaman Ibu', subEn:"Share Your Story" },
+  { id:6, screen:'screen-f6', icon:'🖼️', nameId:'Galeri Penelitian', nameEn:'Research Gallery', color:'orange', subId:'Foto & Dokumentasi', subEn:'Photos & Documentation', adminOnly:true },
+  { id:7, screen:'screen-f7', icon:'👤', nameId:'Manajemen Akun', nameEn:'Account Management', color:'green', subId:'Admin & Viewer', subEn:'Admin & Viewer', adminOnly:true },
+];
+
+// ── LANG ──
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('lang', l);
+  document.getElementById('btn-id').classList.toggle('active', l==='id');
+  document.getElementById('btn-en').classList.toggle('active', l==='en');
+  applyLang();
+}
+function toggleLang() { setLang(lang==='id'?'en':'id'); }
+function applyLang() {
+  const t = T[lang];
+  const q = (id, txt) => { const el=document.getElementById(id); if(el) el.textContent=txt; };
+  q('home-greeting', t.greeting);
+  q('home-title', t.homeTitle);
+  q('home-subtitle', t.homeSub);
+  q('login-sub', t.loginSub);
+  q('label-nama', t.labelNama);
+  q('label-sandi', t.labelSandi);
+  q('btn-masuk', t.btnMasuk);
+  q('login-footer', t.loginFooter);
+  q('f5-desc-sub', t.f5Sub);
+  q('f5-desc-text', t.f5Desc);
+  q('label-nama-ibu', t.labelNamaIbu);
+  q('label-pengalaman', t.labelPengalaman);
+  q('label-perasaan', t.labelPerasaan);
+  q('bnav-home-label', t.navHome);
+  q('bnav-akun-label', t.navAkun);
+  document.getElementById('nav-lang-btn').textContent = lang==='id' ? '🇮🇩 ID' : '🇬🇧 EN';
+  renderFeatureGrid();
+}
+
+// ── TOAST ──
+function toast(msg, dur=2500) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), dur);
+}
+
+// ── SCREEN NAV ──
+function goScreen(id) {
+  const current = document.querySelector('.screen.active');
+  if(current && current.id === id) return;
+  if(current) {
+    screenStack.push(current.id);
+    current.classList.add('prev');
+    current.classList.remove('active');
+  }
+  const next = document.getElementById(id);
+  next.classList.add('active');
+  next.classList.remove('prev');
+  updateNavbar(id);
+  onScreenEnter(id);
+}
+
+function goBack() {
+  if(!screenStack.length) return;
+  const current = document.querySelector('.screen.active');
+  const prevId = screenStack.pop();
+  current.classList.remove('active');
+  const prev = document.getElementById(prevId);
+  prev.classList.remove('prev');
+  prev.classList.add('active');
+  updateNavbar(prevId);
+}
+
+function updateNavbar(screenId) {
+  const navbar = document.getElementById('navbar');
+  const bottomNav = document.getElementById('bottom-nav');
+  const homeScreens = ['screen-home'];
+  if(homeScreens.includes(screenId) || screenId==='screen-splash' || screenId==='screen-login') {
+    navbar.classList.remove('visible');
+  } else {
+    navbar.classList.add('visible');
+  }
+  if(screenId==='screen-splash'||screenId==='screen-login') {
+    bottomNav.classList.remove('visible');
+  } else {
+    bottomNav.classList.add('visible');
+  }
+  const titles = {
+    'screen-home':'ArdiyaMidly',
+    'screen-f1':'The Gentle Breath',
+    'screen-f2':"Dawn Dew & Mom's Grace",
+    'screen-f3':"Silent Embrace of Mom's Soul",
+    'screen-f4':'Research Data',
+    'screen-f5':"Mom's Feedback Corner",
+    'screen-f6':'Galeri Penelitian',
+    'screen-f7':'Manajemen Akun',
+    'screen-qr':'QR Code',
+  };
+  document.getElementById('nav-title').textContent = titles[screenId] || 'ArdiyaMidly';
+}
+
+function onScreenEnter(id) {
+  if(id==='screen-f1') loadVideos(1,'f1-videos');
+  if(id==='screen-f2') loadVideos(2,'f2-videos');
+  if(id==='screen-f3') loadVideos(3,'f3-videos');
+  if(id==='screen-f4') loadResearch();
+  if(id==='screen-f5') loadFeedback();
+  if(id==='screen-f6') loadGallery();
+  if(id==='screen-f7') { loadUsers(); updateCurrentUserCard(); }
+  if(id==='screen-qr') loadQR();
+  initSlideshow(id);
+  // Show admin controls
+  ['f1','f2','f3'].forEach(f => {
+    const el = document.getElementById(f+'-admin-upload');
+    if(el) el.style.display = (currentUser&&currentUser.role==='admin') ? 'block' : 'none';
+  });
+  const galleryUpload = document.getElementById('gallery-upload-area');
+  if(galleryUpload) galleryUpload.style.display = (currentUser&&currentUser.role==='admin') ? 'block' : 'none';
+}
+
+// ── AUTH ──
+function goLogin() {
+  const splash = document.getElementById('screen-splash');
+  splash.classList.remove('active');
+  const login = document.getElementById('screen-login');
+  login.classList.add('active');
+}
+
+async function doLogin() {
+  const nama = document.getElementById('login-nama').value.trim();
+  const sandi = document.getElementById('login-sandi').value;
+  if(!nama||!sandi) return toast('⚠️ Isi nama dan sandi');
+  try {
+    const res = await fetch(`${API}/api/login`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({nama, sandi})
+    });
+    const data = await res.json();
+    if(!res.ok) return toast('❌ ' + (data.detail||'Login gagal'));
+    currentUser = {nama: data.nama, role: data.role};
+    toast('✅ Selamat datang, ' + data.nama);
+    document.getElementById('screen-login').classList.remove('active');
+    document.getElementById('screen-home').classList.add('active');
+    document.getElementById('bottom-nav').classList.add('visible');
+    screenStack = [];
+    renderHomeUser();
+    renderFeatureGrid();
+    applyLang();
+  } catch(e) { toast('❌ Gagal terhubung ke server'); }
+}
+
+function renderHomeUser() {
+  if(!currentUser) return;
+  document.getElementById('home-role').textContent = currentUser.role==='admin' ? '⭐ Admin' : '👁️ Viewer';
+}
+
+async function doLogout() {
+  await fetch(`${API}/api/logout`, {method:'POST'});
+  currentUser = null;
+  closeExit();
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active','prev')});
+  document.getElementById('screen-splash').classList.add('active');
+  document.getElementById('navbar').classList.remove('visible');
+  document.getElementById('bottom-nav').classList.remove('visible');
+  screenStack = [];
+  toast('👋 Sampai jumpa!');
+}
+
+function showExitConfirm() { document.getElementById('exit-overlay').classList.add('open'); }
+function closeExit() { document.getElementById('exit-overlay').classList.remove('open'); }
+
+// ── FEATURE GRID ──
+function renderFeatureGrid() {
+  const grid = document.getElementById('features-grid');
+  grid.innerHTML = '';
+  const visible = FEATURES.filter(f => !f.adminOnly || (currentUser && currentUser.role==='admin'));
+  visible.forEach(f => {
+    const name = lang==='id' ? f.nameId : f.nameEn;
+    const sub = lang==='id' ? f.subId : f.subEn;
+    const div = document.createElement('div');
+    div.className = `feature-card ${f.color}`;
+    div.onclick = () => goScreen(f.screen);
+    div.innerHTML = `
+      <div class="feature-icon ${f.color}">${f.icon}</div>
+      <div class="feature-num">Fitur ${f.id}</div>
+      <div class="feature-name">${name}</div>
+      <div class="feature-name-en">${sub}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+// ── SLIDESHOW ──
+function initSlideshow(screenId) {
+  const map = {'screen-splash':null,'screen-f1':'f1-slideshow','screen-f2':'f2-slideshow','screen-f3':'f3-slideshow'};
+  const sid = map[screenId];
+  if(!sid) return;
+  const ss = document.getElementById(sid);
+  if(!ss) return;
+  const slides = ss.querySelectorAll('.slide');
+  const dotId = sid.replace('-slideshow','-dots');
+  const dotCont = document.getElementById(dotId);
+  if(dotCont) {
+    dotCont.innerHTML = '';
+    slides.forEach((_,i)=>{
+      const d=document.createElement('button');
+      d.className='slide-dot'+(i===0?' active':'');
+      d.onclick=()=>showSlide(sid,i);
+      dotCont.appendChild(d);
+    });
+  }
+  let cur=0;
+  ss._interval = setInterval(()=>{ cur=(cur+1)%slides.length; showSlide(sid,cur); },4000);
+}
+function showSlide(sid, idx) {
+  const ss = document.getElementById(sid);
+  const slides = ss.querySelectorAll('.slide');
+  slides.forEach((s,i)=>s.classList.toggle('active',i===idx));
+  const dotId = sid.replace('-slideshow','-dots');
+  const dots = document.querySelectorAll('#'+dotId+' .slide-dot');
+  dots.forEach((d,i)=>d.classList.toggle('active',i===idx));
+}
+
+// ── VIDEOS ──
+async function loadVideos(fiturId, containerId) {
+  try {
+    const res = await fetch(`${API}/api/videos`);
+    const all = await res.json();
+    const videos = all.filter(v=>v.fitur_id===fiturId);
+    const cont = document.getElementById(containerId);
+    cont.innerHTML = '';
+    if(!videos.length) {
+      cont.innerHTML = '<p style="color:var(--text3);font-size:14px;text-align:center;padding:20px">Belum ada video diunggah</p>';
+      return;
+    }
+    const isOrange = fiturId===2;
+    videos.forEach(v => {
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      const title = lang==='id' ? v.judul : (v.judul_en||v.judul);
+      const adminBar = (currentUser&&currentUser.role==='admin') ?
+        `<div class="video-admin-bar"><button class="btn-danger" onclick="deleteVideo(${v.id},'${containerId}',${fiturId})">Hapus</button></div>` : '';
+      card.innerHTML = `
+        <div class="video-thumb-area${isOrange?' orange-bg':''}" onclick="toggleVideo(this)">
+          <div class="video-play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+          <div class="video-info-top">
+            <div class="video-title-card">${title}</div>
+            ${v.judul_en&&lang==='id'?`<div class="video-title-en">${v.judul_en}</div>`:''}
+            ${v.durasi?`<span class="video-dur">⏱ ${v.durasi}</span>`:''}
+          </div>
+        </div>
+        <div class="video-player-wrap" id="vp-${v.id}">
+          <video controls preload="none" src="${API}/stream/video/${v.filename}"></video>
+        </div>
+        ${adminBar}
+      `;
+      cont.appendChild(card);
+    });
+  } catch(e) { console.error(e); }
+}
+
+function toggleVideo(thumb) {
+  const wrap = thumb.nextElementSibling;
+  const isOpen = wrap.classList.contains('open');
+  // close all other
+  document.querySelectorAll('.video-player-wrap.open').forEach(w=>{
+    if(w!==wrap){w.classList.remove('open');const v=w.querySelector('video');if(v)v.pause();}
+  });
+  wrap.classList.toggle('open',!isOpen);
+  if(!isOpen){ const v=wrap.querySelector('video'); if(v) v.play().catch(()=>{}); }
+  else { const v=wrap.querySelector('video'); if(v) v.pause(); }
+}
+
+function openVideoUpload(fiturId) {
+  currentVideoFitur = fiturId;
+  document.getElementById('modal-video-upload').classList.add('open');
+}
+
+async function submitVideoUpload() {
+  const judul = document.getElementById('v-judul').value.trim();
+  const judul_en = document.getElementById('v-judul-en').value.trim();
+  const durasi = document.getElementById('v-durasi').value.trim();
+  const urutan = document.getElementById('v-urutan').value;
+  const file = document.getElementById('v-file').files[0];
+  if(!judul||!file) return toast('⚠️ Judul dan file wajib diisi');
+  const fd = new FormData();
+  fd.append('fitur_id', currentVideoFitur);
+  fd.append('judul', judul);
+  fd.append('judul_en', judul_en);
+  fd.append('durasi', durasi);
+  fd.append('urutan', urutan);
+  fd.append('video', file);
+  const bar = document.getElementById('video-bar');
+  const prog = document.getElementById('video-progress');
+  prog.classList.add('show'); bar.style.width='10%';
+  try {
+    const xhr = new XMLHttpRequest();
+    xhr.upload.onprogress = e => { if(e.lengthComputable) bar.style.width=(e.loaded/e.total*90+10)+'%'; };
+    await new Promise((res,rej)=>{
+      xhr.onload=()=>res(xhr);
+      xhr.onerror=rej;
+      xhr.open('POST',`${API}/api/videos`);
+      xhr.send(fd);
+    });
+    bar.style.width='100%';
+    if(xhr.status>=400) { toast('❌ Upload gagal'); return; }
+    toast('✅ Video berhasil diunggah!');
+    closeModal('modal-video-upload');
+    ['v-judul','v-judul-en','v-durasi','v-urutan'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('v-file').value='';
+    const contId = `f${currentVideoFitur}-videos`;
+    loadVideos(currentVideoFitur, contId);
+  } catch(e){ toast('❌ Error upload'); }
+  finally { setTimeout(()=>{prog.classList.remove('show');bar.style.width='0'},1000); }
+}
+
+async function deleteVideo(id, containerId, fiturId) {
+  if(!confirm('Hapus video ini?')) return;
+  const res = await fetch(`${API}/api/videos/${id}`, {method:'DELETE'});
+  if(res.ok) { toast('🗑️ Video dihapus'); loadVideos(fiturId, containerId); }
+  else toast('❌ Gagal menghapus');
+}
+
+// ── RESEARCH ──
+async function loadResearch() {
+  const res = await fetch(`${API}/api/research`);
+  const data = await res.json();
+  const tbody = document.getElementById('research-tbody');
+  tbody.innerHTML = '';
+  data.forEach((r,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td><strong>${r.nama_ibu}</strong></td>
+      <td>${r.pekerjaan||'-'}</td>
+      <td style="max-width:180px;white-space:pre-wrap">${r.yang_dirasakan||'-'}</td>
+      <td>
+        <div class="action-btns">
+          <button class="btn-secondary" style="padding:6px 12px;font-size:12px" onclick="editResearch(${r.id},'${escAttr(r.nama_ibu)}','${escAttr(r.pekerjaan||'')}','${escAttr(r.yang_dirasakan||'')}')">Edit</button>
+          <button class="btn-danger" onclick="deleteResearch(${r.id})">Hapus</button>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function escAttr(s){ return s.replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
+
+function openResearchModal() {
+  document.getElementById('research-edit-id').value='';
+  document.getElementById('modal-research-title').textContent='Tambah Data Ibu';
+  ['r-nama','r-pekerjaan','r-dirasakan'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('modal-research').classList.add('open');
+}
+
+function editResearch(id, nama, pekerjaan, dirasakan) {
+  document.getElementById('research-edit-id').value=id;
+  document.getElementById('modal-research-title').textContent='Edit Data Ibu';
+  document.getElementById('r-nama').value=nama;
+  document.getElementById('r-pekerjaan').value=pekerjaan;
+  document.getElementById('r-dirasakan').value=dirasakan;
+  document.getElementById('modal-research').classList.add('open');
+}
+
+async function submitResearch() {
+  const id = document.getElementById('research-edit-id').value;
+  const fd = new FormData();
+  fd.append('nama_ibu', document.getElementById('r-nama').value.trim());
+  fd.append('pekerjaan', document.getElementById('r-pekerjaan').value.trim());
+  fd.append('yang_dirasakan', document.getElementById('r-dirasakan').value.trim());
+  if(!fd.get('nama_ibu')) return toast('⚠️ Nama ibu wajib diisi');
+  const url = id ? `${API}/api/research/${id}` : `${API}/api/research`;
+  const method = id ? 'PUT' : 'POST';
+  const res = await fetch(url, {method, body:fd});
+  if(res.ok) { toast(id?'✅ Data diperbarui':'✅ Data ditambahkan'); closeModal('modal-research'); loadResearch(); }
+  else toast('❌ Gagal menyimpan');
+}
+
+async function deleteResearch(id) {
+  if(!confirm('Hapus data ini?')) return;
+  const res = await fetch(`${API}/api/research/${id}`, {method:'DELETE'});
+  if(res.ok) { toast('🗑️ Data dihapus'); loadResearch(); }
+  else toast('❌ Gagal menghapus');
+}
+
+// ── FEEDBACK ──
+async function loadFeedback() {
+  if(!currentUser || currentUser.role!=='admin') {
+    document.getElementById('feedback-list-area').style.display='none';
+    return;
+  }
+  const res = await fetch(`${API}/api/feedback`);
+  const data = await res.json();
+  document.getElementById('feedback-list-area').style.display='block';
+  const cont = document.getElementById('feedback-list');
+  cont.innerHTML = '';
+  if(!data.length) { cont.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center">Belum ada feedback</p>'; return; }
+  data.forEach(f=>{
+    const card=document.createElement('div');
+    card.className='feedback-card';
+    card.innerHTML=`
+      <div class="feedback-name">💚 ${f.nama_ibu}</div>
+      <div class="feedback-field"><span>Pengalaman Menjaga Anak</span><p>${f.pengalaman||'-'}</p></div>
+      <div class="feedback-field"><span>Perasaan Setelah Menggunakan Aplikasi</span><p>${f.perasaan_setelah||'-'}</p></div>
+      <div style="margin-top:8px;display:flex;justify-content:flex-end">
+        <button class="btn-danger" onclick="deleteFeedback(${f.id})">Hapus</button>
+      </div>`;
+    cont.appendChild(card);
+  });
+}
+
+async function submitFeedback() {
+  const fd = new FormData();
+  fd.append('nama_ibu', document.getElementById('fb-nama').value.trim());
+  fd.append('pengalaman', document.getElementById('fb-pengalaman').value.trim());
+  fd.append('perasaan_setelah', document.getElementById('fb-perasaan').value.trim());
+  if(!fd.get('nama_ibu')) return toast('⚠️ Nama ibu wajib diisi');
+  const res = await fetch(`${API}/api/feedback`, {method:'POST', body:fd});
+  if(res.ok) {
+    toast('💚 Terima kasih! Cerita Anda telah terkirim');
+    ['fb-nama','fb-pengalaman','fb-perasaan'].forEach(id=>document.getElementById(id).value='');
+    loadFeedback();
+  } else toast('❌ Gagal mengirim');
+}
+
+async function deleteFeedback(id) {
+  if(!confirm('Hapus feedback ini?')) return;
+  const res = await fetch(`${API}/api/feedback/${id}`, {method:'DELETE'});
+  if(res.ok) { toast('🗑️ Feedback dihapus'); loadFeedback(); }
+}
+
+// ── GALLERY ──
+async function loadGallery() {
+  const res = await fetch(`${API}/api/gallery`);
+  const data = await res.json();
+  const grid = document.getElementById('gallery-grid');
+  grid.innerHTML = '';
+  if(!data.length) {
+    grid.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center;grid-column:1/-1;padding:20px">Belum ada foto</p>';
+    return;
+  }
+  const isAdmin = currentUser&&currentUser.role==='admin';
+  data.forEach(p=>{
+    const item=document.createElement('div');
+    item.className='gallery-item';
+    const isPdf = p.filename.endsWith('.pdf');
+    const imgHtml = isPdf
+      ? `<div style="background:var(--green-light);height:120px;display:flex;align-items:center;justify-content:center;font-size:36px">📄</div>`
+      : `<img class="gallery-img" src="${API}/uploads/photos/${p.filename}" alt="Foto"/>`;
+    item.innerHTML=`
+      ${imgHtml}
+      <div class="gallery-desc-area">
+        <p class="gallery-desc-text">${p.deskripsi||'<em style="color:var(--text3)">Belum ada deskripsi</em>'}</p>
+        ${isAdmin?`
+        <div class="gallery-actions">
+          <button class="btn-secondary" style="padding:5px 10px;font-size:11px" onclick="openGalleryEdit(${p.id},'${escAttr(p.deskripsi||'')}')">Edit</button>
+          <button class="btn-danger" onclick="deleteGallery(${p.id})">Hapus</button>
+        </div>`:''}
+      </div>`;
+    grid.appendChild(item);
+  });
+}
+
+function previewGalleryUpload(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+  const preview = document.getElementById('gallery-preview');
+  const img = document.getElementById('gallery-preview-img');
+  preview.style.display='block';
+  if(file.type.startsWith('image/')) {
+    img.src=URL.createObjectURL(file);
+    img.style.display='block';
+  } else { img.style.display='none'; }
+}
+
+async function uploadGalleryPhoto() {
+  const file = document.getElementById('gallery-file').files[0];
+  const desc = document.getElementById('gallery-desc-input').value.trim();
+  if(!file) return toast('⚠️ Pilih file terlebih dahulu');
+  const fd = new FormData();
+  fd.append('foto', file);
+  fd.append('deskripsi', desc);
+  const bar=document.getElementById('gallery-bar');
+  const prog=document.getElementById('gallery-progress');
+  prog.classList.add('show'); bar.style.width='10%';
+  try {
+    const xhr=new XMLHttpRequest();
+    xhr.upload.onprogress=e=>{if(e.lengthComputable)bar.style.width=(e.loaded/e.total*90+10)+'%';};
+    await new Promise((res,rej)=>{xhr.onload=()=>res(xhr);xhr.onerror=rej;xhr.open('POST',`${API}/api/gallery`);xhr.send(fd);});
+    bar.style.width='100%';
+    if(xhr.status>=400) return toast('❌ Upload gagal');
+    toast('✅ Foto berhasil diunggah!');
+    document.getElementById('gallery-file').value='';
+    document.getElementById('gallery-preview').style.display='none';
+    document.getElementById('gallery-desc-input').value='';
+    loadGallery();
+  } catch(e){toast('❌ Error upload');}
+  finally{setTimeout(()=>{prog.classList.remove('show');bar.style.width='0'},1000);}
+}
+
+function openGalleryEdit(id, desc) {
+  document.getElementById('gallery-edit-id').value=id;
+  document.getElementById('gallery-edit-desc').value=desc;
+  document.getElementById('modal-gallery-edit').classList.add('open');
+}
+
+async function submitGalleryEdit() {
+  const id=document.getElementById('gallery-edit-id').value;
+  const fd=new FormData();
+  fd.append('deskripsi',document.getElementById('gallery-edit-desc').value.trim());
+  const res=await fetch(`${API}/api/gallery/${id}`,{method:'PUT',body:fd});
+  if(res.ok){toast('✅ Deskripsi diperbarui');closeModal('modal-gallery-edit');loadGallery();}
+  else toast('❌ Gagal menyimpan');
+}
+
+async function deleteGallery(id) {
+  if(!confirm('Hapus foto ini?')) return;
+  const res=await fetch(`${API}/api/gallery/${id}`,{method:'DELETE'});
+  if(res.ok){toast('🗑️ Foto dihapus');loadGallery();}
+  else toast('❌ Gagal menghapus');
+}
+
+// ── USERS ──
+async function loadUsers() {
+  const res=await fetch(`${API}/api/users`);
+  const data=await res.json();
+  const cont=document.getElementById('user-list');
+  cont.innerHTML='';
+  data.forEach(u=>{
+    const card=document.createElement('div');
+    card.className='user-card';
+    card.innerHTML=`
+      <div class="user-avatar">${u.nama[0].toUpperCase()}</div>
+      <div class="user-info">
+        <div class="user-name">${u.nama}</div>
+        <span class="role-badge ${u.role}">${u.role==='admin'?'⭐ Admin':'👁️ Viewer'}</span>
+      </div>
+      ${u.role!=='admin'?`<button class="btn-danger" onclick="deleteUser(${u.id})">Hapus</button>`:''}`;
+    cont.appendChild(card);
+  });
+}
+
+async function addUser() {
+  const nama=document.getElementById('new-user-nama').value.trim();
+  const sandi=document.getElementById('new-user-sandi').value;
+  const role=document.getElementById('new-user-role').value;
+  if(!nama||!sandi) return toast('⚠️ Nama dan sandi wajib diisi');
+  const res=await fetch(`${API}/api/users`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nama,sandi,role})});
+  const data=await res.json();
+  if(!res.ok) return toast('❌ '+(data.detail||'Gagal'));
+  toast('✅ Akun berhasil dibuat');
+  document.getElementById('new-user-nama').value='';
+  document.getElementById('new-user-sandi').value='';
+  loadUsers();
+}
+
+async function deleteUser(id) {
+  if(!confirm('Hapus akun ini?')) return;
+  const res=await fetch(`${API}/api/users/${id}`,{method:'DELETE'});
+  if(res.ok){toast('🗑️ Akun dihapus');loadUsers();}
+  else toast('❌ Gagal menghapus');
+}
+
+function updateCurrentUserCard() {
+  if(!currentUser) return;
+  const el=document.getElementById('current-user-avatar');
+  if(el) el.textContent=currentUser.nama[0].toUpperCase();
+  const nm=document.getElementById('current-user-name');
+  if(nm) nm.textContent=currentUser.nama;
+  const rb=document.getElementById('current-user-role');
+  if(rb){rb.textContent=currentUser.role==='admin'?'⭐ Admin':'👁️ Viewer';rb.className='role-badge '+currentUser.role;}
+}
+
+// ── QR ──
+async function loadQR() {
+  const img=document.getElementById('qr-img');
+  img.src=`${API}/api/qr?t=${Date.now()}`;
+  document.getElementById('app-url').textContent=window.location.origin;
+}
+
+function copyUrl() {
+  navigator.clipboard.writeText(window.location.origin).then(()=>toast('✅ Link disalin!')).catch(()=>toast('⚠️ Tidak bisa menyalin'));
+}
+
+// ── MODAL ──
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
+});
+
+// ── INIT ──
+applyLang();
+// Try auto-login check
+fetch(`${API}/api/me`).then(r=>{
+  if(r.ok) return r.json();
+  throw new Error('not logged in');
+}).then(user=>{
+  currentUser=user;
+  document.getElementById('screen-splash').classList.remove('active');
+  document.getElementById('screen-home').classList.add('active');
+  document.getElementById('bottom-nav').classList.add('visible');
+  renderHomeUser();
+  renderFeatureGrid();
+}).catch(()=>{/* stay on splash */});
+</script>
+</body>
+</html>

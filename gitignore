@@ -10,4 +10,7 @@ static/uploads/photos/*
 !static/uploads/videos/.gitkeep
 !static/uploads/photos/.gitkeep
 
+# Jangan commit APK (terlalu besar) — upload manual via Railway Volume
+static/downloads/*.apk
+
 .DS_Store

@@ -718,13 +718,13 @@ function goBack() {
 function updateNavbar(screenId) {
   const navbar = document.getElementById('navbar');
   const bottomNav = document.getElementById('bottom-nav');
-  const homeScreens = ['screen-home'];
-  if(homeScreens.includes(screenId) || screenId==='screen-splash' || screenId==='screen-login') {
+  const noChromeScreens = ['screen-home','screen-splash','screen-login','screen-register'];
+  if(noChromeScreens.includes(screenId)) {
     navbar.classList.remove('visible');
   } else {
     navbar.classList.add('visible');
   }
-  if(screenId==='screen-splash'||screenId==='screen-login') {
+  if(screenId==='screen-splash'||screenId==='screen-login'||screenId==='screen-register') {
     bottomNav.classList.remove('visible');
   } else {
     bottomNav.classList.add('visible');
@@ -806,9 +806,11 @@ async function doLogout() {
   currentUser = null;
   closeExit();
   document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active','prev')});
-  document.getElementById('screen-splash').classList.add('active');
+  document.getElementById('screen-login').classList.add('active');
   document.getElementById('navbar').classList.remove('visible');
   document.getElementById('bottom-nav').classList.remove('visible');
+  document.getElementById('login-nama').value='';
+  document.getElementById('login-sandi').value='';
   screenStack = [];
   toast('👋 Sampai jumpa!');
 }

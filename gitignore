@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+
+# Jangan commit file upload (video/foto) ke git — simpan di Railway Volume
+static/uploads/videos/*
+static/uploads/photos/*
+!static/uploads/videos/.gitkeep
+!static/uploads/photos/.gitkeep
+
+.DS_Store

@@ -32,7 +32,7 @@ body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);m
 #screen-splash{background:#f0ebe0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;z-index:100;position:fixed;padding:0;transition:opacity .5s ease,visibility .5s;opacity:1}
 #screen-splash:not(.active){opacity:0;visibility:hidden;pointer-events:none;transform:none}
 .splash-logo-wrap{width:100%;max-width:480px;padding:0 32px;display:flex;align-items:center;justify-content:center}
-.splash-logo-img{width:100%;height:auto;object-fit:contain;filter:drop-shadow(0 6px 18px rgba(0,0,0,.08))}
+.splash-logo-img{width:100%;height:auto;object-fit:contain;border-radius:25px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.08))}
 .splash-tagline-id{color:#5a7a62;font-size:14px;text-align:center;padding:0 32px;margin-top:-12px;margin-bottom:28px;font-style:italic}
 .splash-lang{display:flex;gap:8px}
 .splash-lang button{background:rgba(255,255,255,.7);border:1.5px solid #d9cbb0;color:#6b5a3f;padding:7px 16px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;backdrop-filter:blur(4px)}
@@ -222,7 +222,6 @@ tr:hover td{background:#f8fdf9}
   <div class="splash-logo-wrap">
     <img src="/static/logo.png" alt="ArdiaMindly Logo" class="splash-logo-img"/>
   </div>
-  <p class="splash-tagline-id">Teman Setia Ibu Pasca Melahirkan</p>
 </div>
 
 <!-- LOGIN -->

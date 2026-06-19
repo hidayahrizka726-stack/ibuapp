@@ -23,7 +23,7 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:24px;
+  padding:40px 24px;
   position:relative;
   overflow-x:hidden;
 }
@@ -42,7 +42,8 @@ body::before{
   position:relative;
   z-index:1;
   width:100%;
-  max-width:420px;
+  max-width:380px;
+  margin:0 auto;
 }
 .card{
   background:var(--cream2);
@@ -158,6 +159,27 @@ h1{
 @media (min-width:480px){
   .card{padding:48px 40px 42px}
   h1{font-size:28px}
+}
+
+/* Desktop: card stays compact, centered, with subtle floating logo dressing on either side */
+@media (min-width:900px){
+  body{padding:48px}
+  .wrap{max-width:400px}
+  .card{
+    box-shadow:0 32px 80px rgba(61,122,94,.18), 0 4px 14px rgba(61,122,94,.10);
+  }
+  body::after{
+    content:'';
+    position:fixed;
+    top:50%;left:50%;
+    width:min(900px,90vw);
+    height:min(900px,90vw);
+    transform:translate(-50%,-50%);
+    background:
+      radial-gradient(circle, rgba(109,191,150,.06) 0%, transparent 60%);
+    pointer-events:none;
+    z-index:0;
+  }
 }
 </style>
 </head>

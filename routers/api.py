@@ -45,6 +45,23 @@ class RegisterBody(BaseModel):
     sandi: str
     role: str = "viewer"
 
+@router.post("/api/register")
+def register(body: RegisterBody):
+    """Public register — selalu jadi viewer"""
+    conn = get_conn(); cur = conn.cursor()
+    cur.execute("SELECT id FROM users WHERE nama=%s", (body.nama,))
+    if cur.fetchone():
+        cur.close(); conn.close()
+        raise HTTPException(400, "Nama sudah digunakan")
+    hashed = hash_password(body.sandi)
+    cur.execute(
+        "INSERT INTO users (nama, sandi_hash, role) VALUES (%s,%s,'viewer') RETURNING id",
+        (body.nama, hashed)
+    )
+    new_id = cur.fetchone()["id"]
+    conn.commit(); cur.close(); conn.close()
+    return {"id": new_id, "nama": body.nama, "role": "viewer"}
+
 @router.post("/api/users")
 def add_user(body: RegisterBody, user=Depends(require_admin)):
     conn = get_conn(); cur = conn.cursor()
@@ -169,14 +186,15 @@ async def upload_photo(
     deskripsi: str = Form(""),
     user=Depends(require_admin)
 ):
+    import uuid, aiofiles
     ext = foto.filename.rsplit(".", 1)[-1].lower()
     if ext not in ["jpg","jpeg","png","gif","webp","pdf"]:
         raise HTTPException(400, "Format tidak didukung")
-    import uuid
     fname = f"{uuid.uuid4().hex}.{ext}"
     fpath = os.path.join(PHOTO_DIR, fname)
-    with open(fpath, "wb") as f:
-        shutil.copyfileobj(foto.file, f)
+    async with aiofiles.open(fpath, "wb") as f:
+        while chunk := await foto.read(512 * 1024):  # 512KB chunks
+            await f.write(chunk)
     conn = get_conn(); cur = conn.cursor()
     cur.execute(
         "INSERT INTO gallery_photos (filename, deskripsi, uploaded_by) VALUES (%s,%s,%s) RETURNING id",
@@ -236,14 +254,16 @@ async def upload_video(
     video: UploadFile = File(...),
     user=Depends(require_admin)
 ):
+    import uuid, aiofiles
     ext = video.filename.rsplit(".",1)[-1].lower()
     if ext not in ["mp4","webm","mov"]:
         raise HTTPException(400, "Format video tidak didukung (mp4/webm/mov)")
-    import uuid
     fname = f"{uuid.uuid4().hex}.{ext}"
     fpath = os.path.join(VIDEO_DIR, fname)
-    with open(fpath, "wb") as f:
-        shutil.copyfileobj(video.file, f)
+    # Async chunked write — tidak blocking event loop
+    async with aiofiles.open(fpath, "wb") as f:
+        while chunk := await video.read(1024 * 1024):  # 1MB chunks
+            await f.write(chunk)
     conn = get_conn(); cur = conn.cursor()
     cur.execute(
         "INSERT INTO videos (fitur_id, judul, judul_en, durasi, filename, urutan) VALUES (%s,%s,%s,%s,%s,%s) RETURNING id",

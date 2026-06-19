@@ -447,27 +447,43 @@ tr:hover td{background:#f8fdf9}
 
 <!-- FITUR 7: LOGIN / USERS (Admin) -->
 <div class="screen" id="screen-f7">
-  <div class="feature-header">
-    <h2>👤 Manajemen Akun</h2>
-    <p>Kelola pengguna Admin dan Viewer</p>
+  <div class="feature-header" id="f7-header">
+    <h2 id="f7-header-title">👤 Manajemen Akun</h2>
+    <p id="f7-header-sub">Kelola pengguna Admin dan Viewer</p>
   </div>
   <div class="feature-body">
-    <div style="background:#fff;border-radius:var(--radius-sm);padding:16px;box-shadow:var(--shadow);margin-bottom:20px">
-      <div class="section-title">Akun Saat Ini</div>
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="user-avatar" id="current-user-avatar">A</div>
-        <div>
-          <div style="font-weight:800;font-size:15px" id="current-user-name">Admin</div>
-          <span class="role-badge admin" id="current-user-role">Admin</span>
-        </div>
-        <button class="btn-danger" style="margin-left:auto" onclick="showExitConfirm()">Keluar</button>
+
+    <!-- VIEWER: Profile sederhana -->
+    <div id="f7-viewer-view" style="display:none">
+      <div style="background:#fff;border-radius:24px;padding:32px 24px;box-shadow:var(--shadow);text-align:center;margin-top:20px">
+        <div class="user-avatar" id="viewer-avatar" style="width:80px;height:80px;border-radius:50%;font-size:32px;margin:0 auto 16px">A</div>
+        <div style="font-weight:800;font-size:20px;font-family:'Playfair Display',serif" id="viewer-name">Nama</div>
+        <span class="role-badge viewer" id="viewer-role" style="margin-top:8px">👁️ Viewer</span>
+        <p style="color:var(--text3);font-size:13px;margin-top:16px;line-height:1.6">Anda dapat berbagi cerita dan pengalaman melalui Mom's Feedback Corner.</p>
+        <button class="btn-danger" style="width:100%;margin-top:24px;padding:12px" onclick="showExitConfirm()">Keluar</button>
       </div>
     </div>
-    <div class="section-title">Daftar Pengguna</div>
-    <div class="user-list" id="user-list"></div>
-    <div style="margin-top:20px;text-align:center">
-      <button class="btn-secondary" onclick="goScreen('screen-qr')">📱 Lihat QR Code Aplikasi</button>
+
+    <!-- ADMIN: Manajemen lengkap -->
+    <div id="f7-admin-view" style="display:none">
+      <div style="background:#fff;border-radius:var(--radius-sm);padding:16px;box-shadow:var(--shadow);margin-bottom:20px">
+        <div class="section-title">Akun Saat Ini</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="user-avatar" id="current-user-avatar">A</div>
+          <div>
+            <div style="font-weight:800;font-size:15px" id="current-user-name">Admin</div>
+            <span class="role-badge admin" id="current-user-role">Admin</span>
+          </div>
+          <button class="btn-danger" style="margin-left:auto" onclick="showExitConfirm()">Keluar</button>
+        </div>
+      </div>
+      <div class="section-title">Daftar Pengguna</div>
+      <div class="user-list" id="user-list"></div>
+      <div style="margin-top:20px;text-align:center">
+        <button class="btn-secondary" onclick="goScreen('screen-qr')">📱 Lihat QR Code Aplikasi</button>
+      </div>
     </div>
+
   </div>
 </div>
 
@@ -761,7 +777,7 @@ function onScreenEnter(id) {
   if(id==='screen-f4') loadResearch();
   if(id==='screen-f5') loadFeedback();
   if(id==='screen-f6') loadGallery();
-  if(id==='screen-f7') { loadUsers(); updateCurrentUserCard(); }
+  if(id==='screen-f7') { updateCurrentUserCard(); if(isAdmin()) loadUsers(); }
   if(id==='screen-qr') loadQR();
 }
 
@@ -1212,12 +1228,29 @@ async function deleteUser(id) {
 
 function updateCurrentUserCard() {
   if(!currentUser) return;
-  const el=document.getElementById('current-user-avatar');
-  if(el) el.textContent=currentUser.nama[0].toUpperCase();
-  const nm=document.getElementById('current-user-name');
-  if(nm) nm.textContent=currentUser.nama;
-  const rb=document.getElementById('current-user-role');
-  if(rb){rb.textContent=currentUser.role==='admin'?'⭐ Admin':'👁️ Viewer';rb.className='role-badge '+currentUser.role;}
+  const isAdminUser = currentUser.role === 'admin';
+
+  document.getElementById('f7-admin-view').style.display = isAdminUser ? 'block' : 'none';
+  document.getElementById('f7-viewer-view').style.display = isAdminUser ? 'none' : 'block';
+
+  document.getElementById('f7-header-title').textContent = isAdminUser ? '👤 Manajemen Akun' : '👤 Akun Saya';
+  document.getElementById('f7-header-sub').textContent = isAdminUser ? 'Kelola pengguna Admin dan Viewer' : 'Informasi akun Anda';
+
+  if(isAdminUser) {
+    const el=document.getElementById('current-user-avatar');
+    if(el) el.textContent=currentUser.nama[0].toUpperCase();
+    const nm=document.getElementById('current-user-name');
+    if(nm) nm.textContent=currentUser.nama;
+    const rb=document.getElementById('current-user-role');
+    if(rb){rb.textContent='⭐ Admin';rb.className='role-badge admin';}
+  } else {
+    const el=document.getElementById('viewer-avatar');
+    if(el) el.textContent=currentUser.nama[0].toUpperCase();
+    const nm=document.getElementById('viewer-name');
+    if(nm) nm.textContent=currentUser.nama;
+    const rb=document.getElementById('viewer-role');
+    if(rb){rb.textContent='👁️ Viewer';rb.className='role-badge viewer';}
+  }
 }
 
 // ── QR ──

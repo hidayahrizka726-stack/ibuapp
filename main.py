@@ -5,7 +5,7 @@ from fastapi.responses import FileResponse
 from database import init_db
 from routers.api import router
 
-app = FastAPI(title="ArdiyaMidly")
+app = FastAPI(title="ArdiaMindly")
 
 @app.on_event("startup")
 def startup():
@@ -15,6 +15,10 @@ app.include_router(router)
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+@app.get("/download")
+def download_page():
+    return FileResponse(os.path.join(STATIC_DIR, "download.html"))
 
 @app.get("/{full_path:path}")
 def spa(full_path: str):

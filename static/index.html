@@ -155,6 +155,15 @@ tr:hover td{background:#f8fdf9}
 .modal-handle{width:40px;height:4px;background:#e0e0e0;border-radius:2px;margin:0 auto 20px}
 .modal-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:20px;font-weight:700}
 
+/* ── SOURCE TOGGLE (video upload modal) ── */
+.source-toggle{display:flex;gap:8px;margin-bottom:18px;background:var(--green-light);padding:4px;border-radius:14px}
+.source-toggle-btn{flex:1;padding:10px 8px;border:none;background:transparent;border-radius:11px;font-size:13px;font-weight:800;font-family:'Nunito',sans-serif;color:var(--text2);cursor:pointer;transition:all .2s}
+.source-toggle-btn.active{background:#fff;color:var(--green);box-shadow:0 2px 8px rgba(109,191,150,.25)}
+
+/* ── YOUTUBE EMBED ── */
+.yt-embed-wrap{position:relative;width:100%;padding-top:56.25%;background:#000}
+.yt-embed-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+
 /* ── SLIDESHOW (Description) ── */
 .slideshow{position:relative;overflow:hidden;border-radius:var(--radius-sm);margin-bottom:20px}
 .slide{display:none;padding:20px;background:#fff;box-shadow:var(--shadow)}
@@ -504,7 +513,13 @@ tr:hover td{background:#f8fdf9}
 <div class="modal-overlay" id="modal-video-upload">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div class="modal-title">Upload Video</div>
+    <div class="modal-title">Tambah Video</div>
+
+    <div class="source-toggle">
+      <button type="button" class="source-toggle-btn active" id="src-btn-upload" onclick="setVideoSource('upload')">📁 Upload File</button>
+      <button type="button" class="source-toggle-btn" id="src-btn-youtube" onclick="setVideoSource('youtube')">▶️ Link YouTube</button>
+    </div>
+
     <div class="form-group">
       <label>Judul (Indonesia)</label>
       <input type="text" id="v-judul" placeholder="Judul video..."/>
@@ -521,13 +536,20 @@ tr:hover td{background:#f8fdf9}
       <label>Urutan</label>
       <input type="number" id="v-urutan" value="1" min="1"/>
     </div>
-    <div class="form-group">
+
+    <div class="form-group" id="v-file-group">
       <label>File Video (MP4/WebM)</label>
       <input type="file" id="v-file" accept="video/mp4,video/webm,video/quicktime"/>
     </div>
+    <div class="form-group" id="v-youtube-group" style="display:none">
+      <label>Link YouTube</label>
+      <input type="text" id="v-youtube-url" placeholder="https://youtube.com/watch?v=..."/>
+      <p style="font-size:11px;color:var(--text3);margin-top:6px">Tempel link video YouTube — bisa dari watch, youtu.be, atau shorts.</p>
+    </div>
+
     <div class="upload-progress" id="video-progress"><div class="upload-bar" id="video-bar"></div></div>
     <div style="display:flex;gap:10px;margin-top:16px">
-      <button class="btn-primary" onclick="submitVideoUpload()" style="flex:1">Upload</button>
+      <button class="btn-primary" onclick="submitVideoUpload()" style="flex:1">Simpan</button>
       <button class="btn-secondary" onclick="closeModal('modal-video-upload')">Batal</button>
     </div>
   </div>
@@ -905,6 +927,10 @@ async function loadVideos(fiturId, containerId) {
       const title = lang==='id' ? v.judul : (v.judul_en||v.judul);
       const adminBar = isAdmin() ?
         `<div class="video-admin-bar"><button class="btn-danger" onclick="deleteVideo(${v.id},'${containerId}',${fiturId})">Hapus</button></div>` : '';
+      const isYoutube = v.source_type === 'youtube' && v.youtube_id;
+      const playerHtml = isYoutube
+        ? `<div class="yt-embed-wrap"><iframe data-src="https://www.youtube.com/embed/${v.youtube_id}?rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`
+        : `<video controls preload="none" src="${API}/stream/video/${v.filename}"></video>`;
       card.innerHTML = `
         <div class="video-thumb-area${isOrange?' orange-bg':''}" onclick="toggleVideo(this)">
           <div class="video-play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
@@ -912,10 +938,11 @@ async function loadVideos(fiturId, containerId) {
             <div class="video-title-card">${title}</div>
             ${v.judul_en&&lang==='id'?`<div class="video-title-en">${v.judul_en}</div>`:''}
             ${v.durasi?`<span class="video-dur">⏱ ${v.durasi}</span>`:''}
+            ${isYoutube?`<span class="video-dur" style="margin-left:6px">▶️ YouTube</span>`:''}
           </div>
         </div>
         <div class="video-player-wrap" id="vp-${v.id}">
-          <video controls preload="none" src="${API}/stream/video/${v.filename}"></video>
+          ${playerHtml}
         </div>
         ${adminBar}
       `;
@@ -927,17 +954,39 @@ async function loadVideos(fiturId, containerId) {
 function toggleVideo(thumb) {
   const wrap = thumb.nextElementSibling;
   const isOpen = wrap.classList.contains('open');
-  // close all other
+  // close all other (pause native videos, unload YouTube iframes)
   document.querySelectorAll('.video-player-wrap.open').forEach(w=>{
-    if(w!==wrap){w.classList.remove('open');const v=w.querySelector('video');if(v)v.pause();}
+    if(w!==wrap){
+      w.classList.remove('open');
+      const v=w.querySelector('video'); if(v) v.pause();
+      const f=w.querySelector('iframe'); if(f){ f.src=''; f.removeAttribute('src'); }
+    }
   });
   wrap.classList.toggle('open',!isOpen);
-  if(!isOpen){ const v=wrap.querySelector('video'); if(v) v.play().catch(()=>{}); }
-  else { const v=wrap.querySelector('video'); if(v) v.pause(); }
+  if(!isOpen){
+    const v=wrap.querySelector('video'); if(v) v.play().catch(()=>{});
+    const f=wrap.querySelector('iframe');
+    if(f && !f.src && f.dataset.src) f.src = f.dataset.src; // lazy-load YouTube only when opened
+  } else {
+    const v=wrap.querySelector('video'); if(v) v.pause();
+    const f=wrap.querySelector('iframe'); if(f){ f.src=''; f.removeAttribute('src'); }
+  }
+}
+
+let videoSourceMode = 'upload';
+function setVideoSource(mode) {
+  videoSourceMode = mode;
+  document.getElementById('src-btn-upload').classList.toggle('active', mode==='upload');
+  document.getElementById('src-btn-youtube').classList.toggle('active', mode==='youtube');
+  document.getElementById('v-file-group').style.display = mode==='upload' ? 'block' : 'none';
+  document.getElementById('v-youtube-group').style.display = mode==='youtube' ? 'block' : 'none';
 }
 
 function openVideoUpload(fiturId) {
   currentVideoFitur = fiturId;
+  setVideoSource('upload');
+  document.getElementById('v-file').value='';
+  document.getElementById('v-youtube-url').value='';
   document.getElementById('modal-video-upload').classList.add('open');
 }
 
@@ -946,15 +995,25 @@ async function submitVideoUpload() {
   const judul_en = document.getElementById('v-judul-en').value.trim();
   const durasi = document.getElementById('v-durasi').value.trim();
   const urutan = document.getElementById('v-urutan').value;
-  const file = document.getElementById('v-file').files[0];
-  if(!judul||!file) return toast('⚠️ Judul dan file wajib diisi');
+  if(!judul) return toast('⚠️ Judul wajib diisi');
+
   const fd = new FormData();
   fd.append('fitur_id', currentVideoFitur);
   fd.append('judul', judul);
   fd.append('judul_en', judul_en);
   fd.append('durasi', durasi);
   fd.append('urutan', urutan);
-  fd.append('video', file);
+
+  if(videoSourceMode === 'youtube') {
+    const ytUrl = document.getElementById('v-youtube-url').value.trim();
+    if(!ytUrl) return toast('⚠️ Masukkan link YouTube');
+    fd.append('youtube_url', ytUrl);
+  } else {
+    const file = document.getElementById('v-file').files[0];
+    if(!file) return toast('⚠️ Pilih file video');
+    fd.append('video', file);
+  }
+
   const bar = document.getElementById('video-bar');
   const prog = document.getElementById('video-progress');
   prog.classList.add('show'); bar.style.width='10%';
@@ -968,14 +1027,20 @@ async function submitVideoUpload() {
       xhr.send(fd);
     });
     bar.style.width='100%';
-    if(xhr.status>=400) { toast('❌ Upload gagal'); return; }
-    toast('✅ Video berhasil diunggah!');
+    if(xhr.status>=400) {
+      let msg = 'Gagal menyimpan';
+      try { msg = JSON.parse(xhr.responseText).detail || msg; } catch(e){}
+      toast('❌ ' + msg);
+      return;
+    }
+    toast('✅ Video berhasil ditambahkan!');
     closeModal('modal-video-upload');
     ['v-judul','v-judul-en','v-durasi','v-urutan'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('v-file').value='';
+    document.getElementById('v-youtube-url').value='';
     const contId = `f${currentVideoFitur}-videos`;
     loadVideos(currentVideoFitur, contId);
-  } catch(e){ toast('❌ Error upload'); }
+  } catch(e){ toast('❌ Error menyimpan'); }
   finally { setTimeout(()=>{prog.classList.remove('show');bar.style.width='0'},1000); }
 }
 
@@ -1050,16 +1115,14 @@ async function deleteResearch(id) {
 
 // ── FEEDBACK ──
 async function loadFeedback() {
-  if(!currentUser || currentUser.role!=='admin') {
-    document.getElementById('feedback-list-area').style.display='none';
-    return;
-  }
   const res = await fetch(`${API}/api/feedback`);
+  if(!res.ok) return;
   const data = await res.json();
   document.getElementById('feedback-list-area').style.display='block';
   const cont = document.getElementById('feedback-list');
   cont.innerHTML = '';
-  if(!data.length) { cont.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center">Belum ada feedback</p>'; return; }
+  if(!data.length) { cont.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center">Belum ada cerita</p>'; return; }
+  const canDelete = isAdmin();
   data.forEach(f=>{
     const card=document.createElement('div');
     card.className='feedback-card';
@@ -1067,9 +1130,10 @@ async function loadFeedback() {
       <div class="feedback-name">💚 ${f.nama_ibu}</div>
       <div class="feedback-field"><span>Pengalaman Menjaga Anak</span><p>${f.pengalaman||'-'}</p></div>
       <div class="feedback-field"><span>Perasaan Setelah Menggunakan Aplikasi</span><p>${f.perasaan_setelah||'-'}</p></div>
-      <div style="margin-top:8px;display:flex;justify-content:flex-end">
+      ${canDelete ? `<div style="margin-top:8px;display:flex;justify-content:flex-end">
         <button class="btn-danger" onclick="deleteFeedback(${f.id})">Hapus</button>
-      </div>`;
+      </div>` : ''}
+    `;
     cont.appendChild(card);
   });
 }
@@ -1082,7 +1146,7 @@ async function submitFeedback() {
   if(!fd.get('nama_ibu')) return toast('⚠️ Nama ibu wajib diisi');
   const res = await fetch(`${API}/api/feedback`, {method:'POST', body:fd});
   if(res.ok) {
-    toast('💚 Terima kasih! Cerita Anda telah terkirim');
+    toast('💚 Terima kasih! Cerita Anda telah tersimpan', 3500);
     ['fb-nama','fb-pengalaman','fb-perasaan'].forEach(id=>document.getElementById(id).value='');
     loadFeedback();
   } else toast('❌ Gagal mengirim');

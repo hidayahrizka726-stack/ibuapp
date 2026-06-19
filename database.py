@@ -48,13 +48,30 @@ def init_db():
             judul VARCHAR(200) NOT NULL,
             judul_en VARCHAR(200),
             durasi VARCHAR(20),
-            filename VARCHAR(255) NOT NULL,
+            filename VARCHAR(255),
+            source_type VARCHAR(10) NOT NULL DEFAULT 'upload',
+            youtube_id VARCHAR(20),
             urutan INTEGER DEFAULT 1,
             created_at TIMESTAMP DEFAULT NOW()
         )""",
     ]
     for stmt in statements:
         cur.execute(stmt)
+
+    # Migration: tambah kolom baru jika tabel videos sudah ada dari versi lama
+    migration_statements = [
+        "ALTER TABLE videos ALTER COLUMN filename DROP NOT NULL",
+        "ALTER TABLE videos ADD COLUMN IF NOT EXISTS source_type VARCHAR(10) NOT NULL DEFAULT 'upload'",
+        "ALTER TABLE videos ADD COLUMN IF NOT EXISTS youtube_id VARCHAR(20)",
+    ]
+    for stmt in migration_statements:
+        try:
+            cur.execute(stmt)
+        except Exception as e:
+            conn.rollback()
+            print(f"⚠️ Migration skip: {e}")
+        else:
+            conn.commit()
 
     # Seed admin default jika belum ada
     cur.execute("SELECT COUNT(*) as c FROM users WHERE role='admin'")

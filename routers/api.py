@@ -141,7 +141,8 @@ def delete_research(rid: int, user=Depends(require_admin)):
 
 # ─────────────── FEEDBACK ───────────────
 @router.get("/api/feedback")
-def list_feedback(user=Depends(require_admin)):
+def list_feedback():
+    """Publik — semua orang termasuk Viewer & non-login bisa lihat (seperti wall komentar)"""
     conn = get_conn(); cur = conn.cursor()
     cur.execute("SELECT * FROM feedback ORDER BY created_at DESC")
     rows = cur.fetchall(); cur.close(); conn.close()
@@ -251,27 +252,60 @@ async def upload_video(
     judul_en: str = Form(""),
     durasi: str = Form(""),
     urutan: int = Form(1),
-    video: UploadFile = File(...),
+    video: UploadFile = File(None),
+    youtube_url: str = Form(""),
     user=Depends(require_admin)
 ):
-    import uuid, aiofiles
-    ext = video.filename.rsplit(".",1)[-1].lower()
-    if ext not in ["mp4","webm","mov"]:
-        raise HTTPException(400, "Format video tidak didukung (mp4/webm/mov)")
-    fname = f"{uuid.uuid4().hex}.{ext}"
-    fpath = os.path.join(VIDEO_DIR, fname)
-    # Async chunked write — tidak blocking event loop
-    async with aiofiles.open(fpath, "wb") as f:
-        while chunk := await video.read(1024 * 1024):  # 1MB chunks
-            await f.write(chunk)
-    conn = get_conn(); cur = conn.cursor()
-    cur.execute(
-        "INSERT INTO videos (fitur_id, judul, judul_en, durasi, filename, urutan) VALUES (%s,%s,%s,%s,%s,%s) RETURNING id",
-        (fitur_id, judul, judul_en, durasi, fname, urutan)
-    )
-    new_id = cur.fetchone()["id"]
-    conn.commit(); cur.close(); conn.close()
-    return {"id": new_id, "filename": fname}
+    import uuid, aiofiles, re
+
+    youtube_url = youtube_url.strip()
+
+    if youtube_url:
+        # ── Mode YouTube embed ──
+        patterns = [
+            r"(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([A-Za-z0-9_-]{11})"
+        ]
+        yt_id = None
+        for p in patterns:
+            m = re.search(p, youtube_url)
+            if m:
+                yt_id = m.group(1)
+                break
+        if not yt_id:
+            raise HTTPException(400, "Link YouTube tidak valid")
+
+        conn = get_conn(); cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO videos (fitur_id, judul, judul_en, durasi, filename, source_type, youtube_id, urutan) "
+            "VALUES (%s,%s,%s,%s,NULL,'youtube',%s,%s) RETURNING id",
+            (fitur_id, judul, judul_en, durasi, yt_id, urutan)
+        )
+        new_id = cur.fetchone()["id"]
+        conn.commit(); cur.close(); conn.close()
+        return {"id": new_id, "youtube_id": yt_id}
+
+    elif video is not None and video.filename:
+        # ── Mode upload file ──
+        ext = video.filename.rsplit(".",1)[-1].lower()
+        if ext not in ["mp4","webm","mov"]:
+            raise HTTPException(400, "Format video tidak didukung (mp4/webm/mov)")
+        fname = f"{uuid.uuid4().hex}.{ext}"
+        fpath = os.path.join(VIDEO_DIR, fname)
+        async with aiofiles.open(fpath, "wb") as f:
+            while chunk := await video.read(1024 * 1024):  # 1MB chunks
+                await f.write(chunk)
+        conn = get_conn(); cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO videos (fitur_id, judul, judul_en, durasi, filename, source_type, urutan) "
+            "VALUES (%s,%s,%s,%s,%s,'upload',%s) RETURNING id",
+            (fitur_id, judul, judul_en, durasi, fname, urutan)
+        )
+        new_id = cur.fetchone()["id"]
+        conn.commit(); cur.close(); conn.close()
+        return {"id": new_id, "filename": fname}
+
+    else:
+        raise HTTPException(400, "Pilih file video atau masukkan link YouTube")
 
 @router.delete("/api/videos/{vid}")
 def delete_video(vid: int, user=Depends(require_admin)):
@@ -279,9 +313,10 @@ def delete_video(vid: int, user=Depends(require_admin)):
     cur.execute("SELECT filename FROM videos WHERE id=%s", (vid,))
     row = cur.fetchone()
     if row:
-        fpath = os.path.join(VIDEO_DIR, row["filename"])
-        if os.path.exists(fpath):
-            os.remove(fpath)
+        if row["filename"]:
+            fpath = os.path.join(VIDEO_DIR, row["filename"])
+            if os.path.exists(fpath):
+                os.remove(fpath)
         cur.execute("DELETE FROM videos WHERE id=%s", (vid,))
         conn.commit()
     cur.close(); conn.close()

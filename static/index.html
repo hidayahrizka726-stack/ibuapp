@@ -518,8 +518,9 @@ tr:hover td{background:#f8fdf9}
     <div class="modal-title">Tambah Video</div>
 
     <div class="source-toggle">
-      <button type="button" class="source-toggle-btn active" id="src-btn-upload" onclick="setVideoSource('upload')">📁 Upload File</button>
-      <button type="button" class="source-toggle-btn" id="src-btn-youtube" onclick="setVideoSource('youtube')">▶️ Link YouTube</button>
+      <button type="button" class="source-toggle-btn active" id="src-btn-upload" onclick="setVideoSource('upload')">📁 File</button>
+      <button type="button" class="source-toggle-btn" id="src-btn-youtube" onclick="setVideoSource('youtube')">▶️ YouTube</button>
+      <button type="button" class="source-toggle-btn" id="src-btn-gdrive" onclick="setVideoSource('gdrive')">📂 GDrive</button>
     </div>
 
     <div class="form-group">
@@ -547,6 +548,11 @@ tr:hover td{background:#f8fdf9}
       <label>Link YouTube</label>
       <input type="text" id="v-youtube-url" placeholder="https://youtube.com/watch?v=..."/>
       <p style="font-size:11px;color:var(--text3);margin-top:6px">Tempel link video YouTube — bisa dari watch, youtu.be, atau shorts.</p>
+    </div>
+    <div class="form-group" id="v-gdrive-group" style="display:none">
+      <label>Link Google Drive</label>
+      <input type="text" id="v-gdrive-url" placeholder="https://drive.google.com/file/d/.../view"/>
+      <p style="font-size:11px;color:var(--text3);margin-top:6px">Pastikan file di-share dengan akses "Anyone with the link" agar bisa diputar.</p>
     </div>
 
     <div class="upload-progress" id="video-progress"><div class="upload-bar" id="video-bar"></div></div>
@@ -930,9 +936,18 @@ async function loadVideos(fiturId, containerId) {
       const adminBar = isAdmin() ?
         `<div class="video-admin-bar"><button class="btn-danger" onclick="deleteVideo(${v.id},'${containerId}',${fiturId})">Hapus</button></div>` : '';
       const isYoutube = v.source_type === 'youtube' && v.youtube_id;
-      const playerHtml = isYoutube
-        ? `<div class="yt-embed-wrap"><iframe data-src="https://www.youtube.com/embed/${v.youtube_id}?rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`
-        : `<video controls preload="none" src="${API}/stream/video/${v.filename}"></video>`;
+      const isGdrive = v.source_type === 'gdrive' && v.gdrive_id;
+      let playerHtml, sourceBadge;
+      if(isYoutube) {
+        playerHtml = `<div class="yt-embed-wrap"><iframe data-src="https://www.youtube.com/embed/${v.youtube_id}?rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+        sourceBadge = `<span class="video-dur" style="margin-left:6px">▶️ YouTube</span>`;
+      } else if(isGdrive) {
+        playerHtml = `<div class="yt-embed-wrap"><iframe data-src="https://drive.google.com/file/d/${v.gdrive_id}/preview" allow="autoplay" allowfullscreen></iframe></div>`;
+        sourceBadge = `<span class="video-dur" style="margin-left:6px">📂 GDrive</span>`;
+      } else {
+        playerHtml = `<video controls preload="none" src="${API}/stream/video/${v.filename}"></video>`;
+        sourceBadge = '';
+      }
       card.innerHTML = `
         <div class="video-thumb-area${isOrange?' orange-bg':''}" onclick="toggleVideo(this)">
           <div class="video-play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
@@ -940,7 +955,7 @@ async function loadVideos(fiturId, containerId) {
             <div class="video-title-card">${title}</div>
             ${v.judul_en&&lang==='id'?`<div class="video-title-en">${v.judul_en}</div>`:''}
             ${v.durasi?`<span class="video-dur">⏱ ${v.durasi}</span>`:''}
-            ${isYoutube?`<span class="video-dur" style="margin-left:6px">▶️ YouTube</span>`:''}
+            ${sourceBadge}
           </div>
         </div>
         <div class="video-player-wrap" id="vp-${v.id}">
@@ -956,7 +971,7 @@ async function loadVideos(fiturId, containerId) {
 function toggleVideo(thumb) {
   const wrap = thumb.nextElementSibling;
   const isOpen = wrap.classList.contains('open');
-  // close all other (pause native videos, unload YouTube iframes)
+  // close all other (pause native videos, unload embedded iframes)
   document.querySelectorAll('.video-player-wrap.open').forEach(w=>{
     if(w!==wrap){
       w.classList.remove('open');
@@ -968,7 +983,7 @@ function toggleVideo(thumb) {
   if(!isOpen){
     const v=wrap.querySelector('video'); if(v) v.play().catch(()=>{});
     const f=wrap.querySelector('iframe');
-    if(f && !f.src && f.dataset.src) f.src = f.dataset.src; // lazy-load YouTube only when opened
+    if(f && !f.src && f.dataset.src) f.src = f.dataset.src; // lazy-load embed only when opened
   } else {
     const v=wrap.querySelector('video'); if(v) v.pause();
     const f=wrap.querySelector('iframe'); if(f){ f.src=''; f.removeAttribute('src'); }
@@ -980,8 +995,10 @@ function setVideoSource(mode) {
   videoSourceMode = mode;
   document.getElementById('src-btn-upload').classList.toggle('active', mode==='upload');
   document.getElementById('src-btn-youtube').classList.toggle('active', mode==='youtube');
+  document.getElementById('src-btn-gdrive').classList.toggle('active', mode==='gdrive');
   document.getElementById('v-file-group').style.display = mode==='upload' ? 'block' : 'none';
   document.getElementById('v-youtube-group').style.display = mode==='youtube' ? 'block' : 'none';
+  document.getElementById('v-gdrive-group').style.display = mode==='gdrive' ? 'block' : 'none';
 }
 
 function openVideoUpload(fiturId) {
@@ -989,6 +1006,7 @@ function openVideoUpload(fiturId) {
   setVideoSource('upload');
   document.getElementById('v-file').value='';
   document.getElementById('v-youtube-url').value='';
+  document.getElementById('v-gdrive-url').value='';
   document.getElementById('modal-video-upload').classList.add('open');
 }
 
@@ -1010,6 +1028,10 @@ async function submitVideoUpload() {
     const ytUrl = document.getElementById('v-youtube-url').value.trim();
     if(!ytUrl) return toast('⚠️ Masukkan link YouTube');
     fd.append('youtube_url', ytUrl);
+  } else if(videoSourceMode === 'gdrive') {
+    const gdUrl = document.getElementById('v-gdrive-url').value.trim();
+    if(!gdUrl) return toast('⚠️ Masukkan link Google Drive');
+    fd.append('gdrive_url', gdUrl);
   } else {
     const file = document.getElementById('v-file').files[0];
     if(!file) return toast('⚠️ Pilih file video');
@@ -1040,6 +1062,7 @@ async function submitVideoUpload() {
     ['v-judul','v-judul-en','v-durasi','v-urutan'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('v-file').value='';
     document.getElementById('v-youtube-url').value='';
+    document.getElementById('v-gdrive-url').value='';
     const contId = `f${currentVideoFitur}-videos`;
     loadVideos(currentVideoFitur, contId);
   } catch(e){ toast('❌ Error menyimpan'); }

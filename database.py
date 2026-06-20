@@ -51,6 +51,7 @@ def init_db():
             filename VARCHAR(255),
             source_type VARCHAR(10) NOT NULL DEFAULT 'upload',
             youtube_id VARCHAR(20),
+            gdrive_id VARCHAR(100),
             urutan INTEGER DEFAULT 1,
             created_at TIMESTAMP DEFAULT NOW()
         )""",
@@ -63,6 +64,7 @@ def init_db():
         "ALTER TABLE videos ALTER COLUMN filename DROP NOT NULL",
         "ALTER TABLE videos ADD COLUMN IF NOT EXISTS source_type VARCHAR(10) NOT NULL DEFAULT 'upload'",
         "ALTER TABLE videos ADD COLUMN IF NOT EXISTS youtube_id VARCHAR(20)",
+        "ALTER TABLE videos ADD COLUMN IF NOT EXISTS gdrive_id VARCHAR(100)",
     ]
     for stmt in migration_statements:
         try:

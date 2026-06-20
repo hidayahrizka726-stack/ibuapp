@@ -313,11 +313,13 @@ async def upload_video(
     urutan: int = Form(1),
     video: UploadFile = File(None),
     youtube_url: str = Form(""),
+    gdrive_url: str = Form(""),
     user=Depends(require_admin)
 ):
     import uuid, aiofiles, re
 
     youtube_url = youtube_url.strip()
+    gdrive_url = gdrive_url.strip()
 
     if youtube_url:
         # ── Mode YouTube embed ──
@@ -343,6 +345,31 @@ async def upload_video(
         conn.commit(); cur.close(); conn.close()
         return {"id": new_id, "youtube_id": yt_id}
 
+    elif gdrive_url:
+        # ── Mode Google Drive embed ──
+        patterns = [
+            r"\/file\/d\/([A-Za-z0-9_-]{20,})",
+            r"[?&]id=([A-Za-z0-9_-]{20,})",
+        ]
+        gd_id = None
+        for p in patterns:
+            m = re.search(p, gdrive_url)
+            if m:
+                gd_id = m.group(1)
+                break
+        if not gd_id:
+            raise HTTPException(400, "Link Google Drive tidak valid. Pastikan link berbentuk 'https://drive.google.com/file/d/.../view'")
+
+        conn = get_conn(); cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO videos (fitur_id, judul, judul_en, durasi, filename, source_type, gdrive_id, urutan) "
+            "VALUES (%s,%s,%s,%s,NULL,'gdrive',%s,%s) RETURNING id",
+            (fitur_id, judul, judul_en, durasi, gd_id, urutan)
+        )
+        new_id = cur.fetchone()["id"]
+        conn.commit(); cur.close(); conn.close()
+        return {"id": new_id, "gdrive_id": gd_id}
+
     elif video is not None and video.filename:
         # ── Mode upload file ──
         ext = video.filename.rsplit(".",1)[-1].lower()
@@ -364,7 +391,7 @@ async def upload_video(
         return {"id": new_id, "filename": fname}
 
     else:
-        raise HTTPException(400, "Pilih file video atau masukkan link YouTube")
+        raise HTTPException(400, "Pilih file video, link YouTube, atau link Google Drive")
 
 @router.delete("/api/videos/{vid}")
 def delete_video(vid: int, user=Depends(require_admin)):

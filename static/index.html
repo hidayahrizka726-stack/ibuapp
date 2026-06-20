@@ -421,8 +421,11 @@ tr:hover td{background:#f8fdf9}
     </div>
     <button class="btn-primary" onclick="submitFeedback()">Kirim Cerita 💚</button>
     <div id="feedback-list-area" style="display:none">
-      <div class="section-title" style="margin-top:28px">Semua Cerita Ibu</div>
-      <div class="feedback-list" id="feedback-list"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:28px;gap:10px">
+        <div class="section-title" style="margin-bottom:0">Semua Cerita Ibu</div>
+        <button class="btn-secondary" id="btn-export-feedback" style="display:none;white-space:nowrap" onclick="exportFeedback()">📊 Export Excel</button>
+      </div>
+      <div class="feedback-list" id="feedback-list" style="margin-top:14px"></div>
     </div>
   </div>
 </div>
@@ -487,7 +490,9 @@ tr:hover td{background:#f8fdf9}
       </div>
       <div class="section-title">Daftar Pengguna</div>
       <div class="user-list" id="user-list"></div>
-   
+      <div style="margin-top:20px;text-align:center">
+        <button class="btn-secondary" onclick="goScreen('screen-qr')">📱 Lihat QR Code Aplikasi</button>
+      </div>
     </div>
 
   </div>
@@ -1116,6 +1121,8 @@ async function loadFeedback() {
   if(!res.ok) return;
   const data = await res.json();
   document.getElementById('feedback-list-area').style.display='block';
+  const exportBtn = document.getElementById('btn-export-feedback');
+  if(exportBtn) exportBtn.style.display = isAdmin() ? 'inline-block' : 'none';
   const cont = document.getElementById('feedback-list');
   cont.innerHTML = '';
   if(!data.length) { cont.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center">Belum ada cerita</p>'; return; }
@@ -1133,6 +1140,34 @@ async function loadFeedback() {
     `;
     cont.appendChild(card);
   });
+}
+
+async function exportFeedback() {
+  const btn = document.getElementById('btn-export-feedback');
+  const originalText = btn.textContent;
+  btn.textContent = '⏳ Mengunduh...';
+  btn.disabled = true;
+  try {
+    const res = await fetch(`${API}/api/feedback/export`);
+    if(!res.ok) { toast('❌ Gagal export'); return; }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const disposition = res.headers.get('Content-Disposition') || '';
+    const match = disposition.match(/filename="(.+)"/);
+    a.download = match ? match[1] : 'feedback_ardiamindly.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast('✅ File Excel berhasil diunduh');
+  } catch(e) {
+    toast('❌ Gagal mengunduh file');
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
 }
 
 async function submitFeedback() {

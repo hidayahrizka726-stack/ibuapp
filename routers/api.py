@@ -173,6 +173,65 @@ def delete_feedback(fid: int, user=Depends(require_admin)):
     conn.commit(); cur.close(); conn.close()
     return {"ok": True}
 
+@router.get("/api/feedback/export")
+def export_feedback(user=Depends(require_admin)):
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from datetime import datetime
+
+    conn = get_conn(); cur = conn.cursor()
+    cur.execute("SELECT * FROM feedback ORDER BY created_at DESC")
+    rows = cur.fetchall()
+    cur.close(); conn.close()
+
+    wb = Workbook()
+    sheet = wb.active
+    sheet.title = "Feedback Ibu"
+
+    headers = ["No", "Nama Ibu", "Pengalaman Menjaga Anak", "Perasaan Setelah Menggunakan Aplikasi", "Tanggal Dikirim"]
+    sheet.append(headers)
+
+    header_fill = PatternFill("solid", start_color="6DBF96", end_color="6DBF96")
+    header_font = Font(bold=True, color="FFFFFF", size=11)
+    thin_border = Border(
+        left=Side(style="thin", color="DDDDDD"), right=Side(style="thin", color="DDDDDD"),
+        top=Side(style="thin", color="DDDDDD"), bottom=Side(style="thin", color="DDDDDD")
+    )
+    for col_idx, _ in enumerate(headers, start=1):
+        cell = sheet.cell(row=1, column=col_idx)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        cell.border = thin_border
+
+    for i, r in enumerate(rows, start=1):
+        tanggal = r["created_at"].strftime("%d-%m-%Y %H:%M") if r["created_at"] else "-"
+        row_data = [i, r["nama_ibu"], r["pengalaman"] or "-", r["perasaan_setelah"] or "-", tanggal]
+        sheet.append(row_data)
+        row_idx = i + 1
+        for col_idx in range(1, len(headers) + 1):
+            cell = sheet.cell(row=row_idx, column=col_idx)
+            cell.border = thin_border
+            cell.alignment = Alignment(vertical="top", wrap_text=True)
+
+    sheet.column_dimensions['A'].width = 6
+    sheet.column_dimensions['B'].width = 22
+    sheet.column_dimensions['C'].width = 45
+    sheet.column_dimensions['D'].width = 45
+    sheet.column_dimensions['E'].width = 18
+    sheet.freeze_panes = "A2"
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+
+    fname = f"feedback_ardiamindly_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+    return StreamingResponse(
+        buf,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="{fname}"'}
+    )
+
 # ─────────────── GALLERY ───────────────
 @router.get("/api/gallery")
 def list_gallery(user=Depends(require_admin)):

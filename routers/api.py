@@ -393,6 +393,27 @@ async def upload_video(
     else:
         raise HTTPException(400, "Pilih file video, link YouTube, atau link Google Drive")
 
+@router.put("/api/videos/{vid}")
+def update_video(
+    vid: int,
+    judul: str = Form(...),
+    judul_en: str = Form(""),
+    durasi: str = Form(""),
+    urutan: int = Form(1),
+    user=Depends(require_admin)
+):
+    conn = get_conn(); cur = conn.cursor()
+    cur.execute("SELECT id FROM videos WHERE id=%s", (vid,))
+    if not cur.fetchone():
+        cur.close(); conn.close()
+        raise HTTPException(404, "Video tidak ditemukan")
+    cur.execute(
+        "UPDATE videos SET judul=%s, judul_en=%s, durasi=%s, urutan=%s WHERE id=%s",
+        (judul, judul_en, durasi, urutan, vid)
+    )
+    conn.commit(); cur.close(); conn.close()
+    return {"ok": True}
+
 @router.delete("/api/videos/{vid}")
 def delete_video(vid: int, user=Depends(require_admin)):
     conn = get_conn(); cur = conn.cursor()

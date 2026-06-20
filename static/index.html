@@ -116,7 +116,7 @@ body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);m
 .video-player-wrap{display:none;padding:0}
 .video-player-wrap.open{display:block}
 .video-player-wrap video{width:100%;max-height:260px;background:#000;display:block}
-.video-admin-bar{padding:12px 16px;display:flex;justify-content:flex-end}
+.video-admin-bar{padding:12px 16px;display:flex;justify-content:flex-end;gap:8px}
 
 /* ── DESCRIPTION BOX ── */
 .desc-box{background:#fef0dc;border-radius:var(--radius-sm);padding:16px;margin-bottom:20px;border-left:4px solid var(--orange)}
@@ -515,9 +515,10 @@ tr:hover td{background:#f8fdf9}
 <div class="modal-overlay" id="modal-video-upload">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div class="modal-title">Tambah Video</div>
+    <div class="modal-title" id="modal-video-title">Tambah Video</div>
+    <input type="hidden" id="v-edit-id" value=""/>
 
-    <div class="source-toggle">
+    <div class="source-toggle" id="v-source-toggle">
       <button type="button" class="source-toggle-btn active" id="src-btn-upload" onclick="setVideoSource('upload')">📁 File</button>
       <button type="button" class="source-toggle-btn" id="src-btn-youtube" onclick="setVideoSource('youtube')">▶️ YouTube</button>
       <button type="button" class="source-toggle-btn" id="src-btn-gdrive" onclick="setVideoSource('gdrive')">📂 GDrive</button>
@@ -557,7 +558,7 @@ tr:hover td{background:#f8fdf9}
 
     <div class="upload-progress" id="video-progress"><div class="upload-bar" id="video-bar"></div></div>
     <div style="display:flex;gap:10px;margin-top:16px">
-      <button class="btn-primary" onclick="submitVideoUpload()" style="flex:1">Simpan</button>
+      <button class="btn-primary" onclick="submitVideoForm()" style="flex:1">Simpan</button>
       <button class="btn-secondary" onclick="closeModal('modal-video-upload')">Batal</button>
     </div>
   </div>
@@ -934,7 +935,10 @@ async function loadVideos(fiturId, containerId) {
       card.className = 'video-card';
       const title = lang==='id' ? v.judul : (v.judul_en||v.judul);
       const adminBar = isAdmin() ?
-        `<div class="video-admin-bar"><button class="btn-danger" onclick="deleteVideo(${v.id},'${containerId}',${fiturId})">Hapus</button></div>` : '';
+        `<div class="video-admin-bar">
+          <button class="btn-secondary" onclick='openVideoEdit(${v.id}, ${JSON.stringify(v.judul)}, ${JSON.stringify(v.judul_en||"")}, ${JSON.stringify(v.durasi||"")}, ${v.urutan||1})'>Edit</button>
+          <button class="btn-danger" onclick="deleteVideo(${v.id},'${containerId}',${fiturId})">Hapus</button>
+        </div>` : '';
       const isYoutube = v.source_type === 'youtube' && v.youtube_id;
       const isGdrive = v.source_type === 'gdrive' && v.gdrive_id;
       let playerHtml, sourceBadge;
@@ -1003,11 +1007,65 @@ function setVideoSource(mode) {
 
 function openVideoUpload(fiturId) {
   currentVideoFitur = fiturId;
+  document.getElementById('v-edit-id').value = '';
+  document.getElementById('modal-video-title').textContent = 'Tambah Video';
+  document.getElementById('v-source-toggle').style.display = 'flex';
   setVideoSource('upload');
+  ['v-judul','v-judul-en','v-durasi'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('v-urutan').value = '1';
   document.getElementById('v-file').value='';
   document.getElementById('v-youtube-url').value='';
   document.getElementById('v-gdrive-url').value='';
   document.getElementById('modal-video-upload').classList.add('open');
+}
+
+function openVideoEdit(id, judul, judulEn, durasi, urutan) {
+  document.getElementById('v-edit-id').value = id;
+  document.getElementById('modal-video-title').textContent = 'Edit Video';
+  // Mode edit: sembunyikan toggle sumber & semua field sumber — hanya edit metadata
+  document.getElementById('v-source-toggle').style.display = 'none';
+  document.getElementById('v-file-group').style.display = 'none';
+  document.getElementById('v-youtube-group').style.display = 'none';
+  document.getElementById('v-gdrive-group').style.display = 'none';
+  document.getElementById('v-judul').value = judul || '';
+  document.getElementById('v-judul-en').value = judulEn || '';
+  document.getElementById('v-durasi').value = durasi || '';
+  document.getElementById('v-urutan').value = urutan || 1;
+  document.getElementById('modal-video-upload').classList.add('open');
+}
+
+function submitVideoForm() {
+  const editId = document.getElementById('v-edit-id').value;
+  if(editId) submitVideoEdit(editId);
+  else submitVideoUpload();
+}
+
+async function submitVideoEdit(id) {
+  const judul = document.getElementById('v-judul').value.trim();
+  const judul_en = document.getElementById('v-judul-en').value.trim();
+  const durasi = document.getElementById('v-durasi').value.trim();
+  const urutan = document.getElementById('v-urutan').value;
+  if(!judul) return toast('⚠️ Judul wajib diisi');
+
+  const fd = new FormData();
+  fd.append('judul', judul);
+  fd.append('judul_en', judul_en);
+  fd.append('durasi', durasi);
+  fd.append('urutan', urutan);
+
+  try {
+    const res = await fetch(`${API}/api/videos/${id}`, {method:'PUT', body:fd});
+    if(!res.ok) {
+      let msg = 'Gagal menyimpan perubahan';
+      try { msg = (await res.json()).detail || msg; } catch(e){}
+      toast('❌ ' + msg);
+      return;
+    }
+    toast('✅ Video berhasil diperbarui');
+    closeModal('modal-video-upload');
+    const contId = `f${currentVideoFitur}-videos`;
+    loadVideos(currentVideoFitur, contId);
+  } catch(e) { toast('❌ Error menyimpan'); }
 }
 
 async function submitVideoUpload() {

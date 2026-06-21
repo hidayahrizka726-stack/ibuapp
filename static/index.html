@@ -67,9 +67,6 @@ body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);m
 
 /* ── HOME SCREEN ── */
 #screen-home{padding-top:0}
-.brand-banner{display:flex;align-items:center;justify-content:center;gap:8px;padding:18px 20px 8px;background:var(--cream)}
-.brand-leaf{width:22px;height:22px;color:var(--orange);flex-shrink:0}
-.brand-name{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--orange);letter-spacing:.2px}
 .home-header{background:linear-gradient(135deg,#6dbf96 0%,#85d0aa 100%);padding:28px 20px 36px;position:relative;overflow:hidden}
 .home-header::after{content:'';position:absolute;bottom:-20px;left:0;right:0;height:40px;background:var(--cream);border-radius:20px 20px 0 0}
 .home-greeting{color:rgba(255,255,255,.75);font-size:13px;margin-bottom:4px}
@@ -84,9 +81,9 @@ body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);m
 .feature-card.green::before{background:var(--green)}
 .feature-card.orange::before{background:var(--orange)}
 .feature-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:12px}
-.feature-icon svg{width:24px;height:24px}
-.feature-icon.green{background:var(--green-light);color:var(--green);--feather-line:var(--green-light)}
-.feature-icon.orange{background:var(--orange-light);color:var(--orange);--feather-line:var(--orange-light)}
+.feature-icon img{width:30px;height:30px;object-fit:contain}
+.feature-icon.green{background:var(--green-light);color:var(--green)}
+.feature-icon.orange{background:var(--orange-light);color:var(--orange)}
 .feature-num{font-size:10px;font-weight:800;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
 .feature-name{font-size:13px;font-weight:800;color:var(--text);line-height:1.3}
 .feature-name-en{font-size:11px;color:var(--text3);margin-top:2px;font-style:italic}
@@ -103,7 +100,8 @@ body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);m
 .feature-header{padding:80px 20px 20px;background:linear-gradient(135deg,#6dbf96,#85d0aa);position:sticky;top:0;z-index:5}
 .feature-header.orange-grad{background:linear-gradient(135deg,#c8824a,#e8a96a)}
 .feature-header h2{font-family:'Playfair Display',serif;color:#fff;font-size:22px;font-weight:700;display:flex;align-items:center;gap:10px}
-.header-icon-svg{width:26px;height:26px;flex-shrink:0}
+.header-icon-circle{width:34px;height:34px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header-icon-circle img{width:22px;height:22px;object-fit:contain}
 .feature-header p{color:rgba(255,255,255,.75);font-size:13px;margin-top:6px;line-height:1.5}
 .feature-body{padding:20px 16px 100px}
 
@@ -184,7 +182,7 @@ tr:hover td{background:#f8fdf9}
 
 /* ── ABOUT SCREEN ── */
 .about-banner{background:linear-gradient(135deg,#6dbf96 0%,#85d0aa 100%);padding:80px 20px 32px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
-.about-banner .brand-leaf{width:32px;height:32px;color:#fff}
+.brand-leaf-img{width:36px;height:auto;filter:brightness(0) invert(1)}
 .about-banner .brand-name{color:#fff}
 .about-tagline{color:rgba(255,255,255,.85);font-size:13px;font-style:italic;margin-top:2px}
 .lang-pill-toggle{display:flex;gap:8px;margin-bottom:18px}
@@ -314,10 +312,6 @@ tr:hover td{background:#f8fdf9}
 
 <!-- HOME -->
 <div class="screen" id="screen-home">
-  <div class="brand-banner">
-    <svg class="brand-leaf" viewBox="0 0 24 24" fill="none"><path d="M12 2c4 0 7 3.5 7 8 0 5-3.5 9-7 11-3.5-2-7-6-7-11 0-4.5 3-8 7-8z" fill="currentColor"/><path d="M12 4.5C9 6 7 9 7 12.5" stroke="rgba(255,255,255,.35)" stroke-width="1.3" stroke-linecap="round"/></svg>
-    <span class="brand-name">ArdiaMindly</span>
-  </div>
   <div class="home-header">
     <div class="home-greeting" id="home-greeting">Selamat datang,</div>
     <div class="home-title" id="home-title">ArdiaMindly 🌿</div>
@@ -330,7 +324,7 @@ tr:hover td{background:#f8fdf9}
 <!-- FITUR 1: THE GENTLE BREATH -->
 <div class="screen" id="screen-f1">
   <div class="feature-header">
-    <h2><svg class="header-icon-svg" viewBox="0 0 24 24" fill="none"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" fill="#fff"/><line x1="16" y1="8" x2="2" y2="22" stroke="rgba(0,0,0,.25)" stroke-width="1.4" stroke-linecap="round"/><path d="M17.5 15H9" stroke="rgba(0,0,0,.25)" stroke-width="1.4" stroke-linecap="round"/></svg> The Gentle Breath</h2>
+    <h2><span class="header-icon-circle"><img src="/static/icons/gentle_breath.png" alt=""/></span> The Gentle Breath</h2>
     <p id="f1-desc-sub">— saat tubuh lelah, tarik napas pelan —</p>
   </div>
   <div class="feature-body">
@@ -356,7 +350,7 @@ tr:hover td{background:#f8fdf9}
 <!-- FITUR 2: DAWN DEW & MOMS GRACE -->
 <div class="screen" id="screen-f2">
   <div class="feature-header orange-grad">
-    <h2><svg class="header-icon-svg" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.4" fill="#fff"/><path d="M9 2.3v1.6M9 11.5v1.6M3.7 8H2.3M15.7 8h-1.4M4.9 3.9l1.1 1.1M12 3.9l-1.1 1.1" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><path d="M6 20a3.6 3.6 0 0 1 .3-7.2 4.6 4.6 0 0 1 8.7-1.4A3.8 3.8 0 0 1 18.5 18a3.7 3.7 0 0 1-3.5 2z" fill="#fff"/></svg> Dawn Dew & Mom's Grace</h2>
+    <h2><span class="header-icon-circle"><img src="/static/icons/dawn_dew.png" alt=""/></span> Dawn Dew & Mom's Grace</h2>
     <p id="f2-desc-sub">— secercah cahaya di pagi yang sunyi —</p>
   </div>
   <div class="feature-body">
@@ -382,7 +376,7 @@ tr:hover td{background:#f8fdf9}
 <!-- FITUR 3: THE SILENT EMBRACE -->
 <div class="screen" id="screen-f3">
   <div class="feature-header">
-    <h2><svg class="header-icon-svg" viewBox="0 0 24 24" fill="none"><path d="M12 5.2c1-1.6 3.4-1.9 4.7-.6 1.4 1.4 1.3 3.5-.3 5L12 14 7.6 9.6c-1.6-1.5-1.7-3.6-.3-5 1.3-1.3 3.7-1 4.7.6z" fill="#fff"/><path d="M3 15.5h4.2c.6 0 1.1.2 1.6.6l1.7 1.3c.8.6.8 1.8-.1 2.3-.5.3-1.1.3-1.6 0l-2.3-1.3" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14.6h2.6c2 0 3 .5 4.4 1.6l2 1.5c1.2.9 2.9.6 4-.6L21 11.8" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> The Silent Embrace of Mom's Soul</h2>
+    <h2><span class="header-icon-circle"><img src="/static/icons/silent_embrace.png" alt=""/></span> The Silent Embrace of Mom's Soul</h2>
     <p id="f3-desc-sub">— pelukan yang selalu ada meski tak terlihat —</p>
   </div>
   <div class="feature-body">
@@ -425,7 +419,7 @@ tr:hover td{background:#f8fdf9}
 <!-- FITUR 5: FEEDBACK -->
 <div class="screen" id="screen-f5">
   <div class="feature-header">
-    <h2><svg class="header-icon-svg" viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8A2.5 2.5 0 0 1 17.5 16H10l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 13.5z" fill="#fff"/><circle cx="8.5" cy="9.5" r="1" fill="var(--green2,#85d0aa)"/><circle cx="12" cy="9.5" r="1" fill="var(--green2,#85d0aa)"/><circle cx="15.5" cy="9.5" r="1" fill="var(--green2,#85d0aa)"/></svg> Mom's Feedback Corner</h2>
+    <h2><span class="header-icon-circle"><img src="/static/icons/feedback_corner.png" alt=""/></span> Mom's Feedback Corner</h2>
     <p id="f5-desc-sub">— ruang untuk suara hatimu didengar —</p>
   </div>
   <div class="feature-body">
@@ -541,7 +535,7 @@ tr:hover td{background:#f8fdf9}
 <!-- ABOUT SCREEN -->
 <div class="screen" id="screen-about">
   <div class="about-banner">
-    <svg class="brand-leaf" viewBox="0 0 24 24" fill="none"><path d="M12 2c4 0 7 3.5 7 8 0 5-3.5 9-7 11-3.5-2-7-6-7-11 0-4.5 3-8 7-8z" fill="currentColor"/><path d="M12 4.5C9 6 7 9 7 12.5" stroke="rgba(255,255,255,.35)" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <img src="/static/icons/leaf_logo.png" alt="" class="brand-leaf-img"/>
     <span class="brand-name" style="font-size:26px">ArdiaMindly</span>
     <p class="about-tagline">A Mindful Companion for Postpartum Moms</p>
   </div>
@@ -564,7 +558,7 @@ tr:hover td{background:#f8fdf9}
     <div class="about-quote-card">
       <div class="about-quote-mark">"</div>
       <div class="about-quote-title">
-        <svg viewBox="0 0 24 24" fill="none" style="width:18px;height:18px;color:var(--green);flex-shrink:0"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" fill="currentColor"/></svg>
+        <img src="/static/icons/gentle_breath.png" alt="" style="width:18px;height:18px;object-fit:contain;flex-shrink:0"/>
         <span id="about-quote-title-text">Nafas yang Memulihkan</span>
       </div>
       <p class="about-quote-text" id="about-quote-text">"Ibu, ambillah waktu sejenak untuk kembali pada napasmu."</p>
@@ -733,21 +727,22 @@ const T = {
   }
 };
 
-const SVG_ICONS = {
-  feather: `<svg viewBox="0 0 24 24" fill="none"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" fill="currentColor"/><line x1="16" y1="8" x2="2" y2="22" stroke="var(--feather-line, #fff)" stroke-width="1.6" stroke-linecap="round"/><path d="M17.5 15H9" stroke="var(--feather-line, #fff)" stroke-width="1.6" stroke-linecap="round"/></svg>`,
-  sunCloud: `<svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.4" fill="currentColor"/><path d="M9 2.3v1.6M9 11.5v1.6M3.7 8H2.3M15.7 8h-1.4M4.9 3.9l1.1 1.1M12 3.9l-1.1 1.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M6 20a3.6 3.6 0 0 1 .3-7.2 4.6 4.6 0 0 1 8.7-1.4A3.8 3.8 0 0 1 18.5 18a3.7 3.7 0 0 1-3.5 2z" fill="currentColor"/></svg>`,
-  heartHand: `<svg viewBox="0 0 24 24" fill="none"><path d="M12 5.2c1-1.6 3.4-1.9 4.7-.6 1.4 1.4 1.3 3.5-.3 5L12 14 7.6 9.6c-1.6-1.5-1.7-3.6-.3-5 1.3-1.3 3.7-1 4.7.6z" fill="currentColor"/><path d="M3 15.5h4.2c.6 0 1.1.2 1.6.6l1.7 1.3c.8.6.8 1.8-.1 2.3-.5.3-1.1.3-1.6 0l-2.3-1.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14.6h2.6c2 0 3 .5 4.4 1.6l2 1.5c1.2.9 2.9.6 4-.6L21 11.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  chatNote: `<svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8A2.5 2.5 0 0 1 17.5 16H10l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 13.5z" fill="currentColor"/><circle cx="8.5" cy="9.5" r="1" fill="var(--feather-line,#fff)"/><circle cx="12" cy="9.5" r="1" fill="var(--feather-line,#fff)"/><circle cx="15.5" cy="9.5" r="1" fill="var(--feather-line,#fff)"/></svg>`,
+const ICON_IMG = {
+  feather: '/static/icons/gentle_breath.png',
+  sunCloud: '/static/icons/dawn_dew.png',
+  heartHand: '/static/icons/silent_embrace.png',
+  chatNote: '/static/icons/feedback_corner.png',
 };
 
 const FEATURES = [
-  { id:1, screen:'screen-f1', icon:SVG_ICONS.feather, nameId:'The Gentle Breath', nameEn:'The Gentle Breath', color:'green', subId:'Nafas yang Memulihkan', subEn:'3 Breathing Affirmations' },
-  { id:2, screen:'screen-f2', icon:SVG_ICONS.sunCloud, nameId:"Dawn Dew & Mom's Grace", nameEn:"Dawn Dew & Mom's Grace", color:'orange', subId:'Fajar & Kelembutan Ibu', subEn:'7 Morning Affirmations' },
-  { id:3, screen:'screen-f3', icon:SVG_ICONS.heartHand, nameId:"The Silent Embrace", nameEn:"Silent Embrace of Mom's Soul", color:'green', subId:'Dekap yang Tak Bersuara', subEn:'7 Soul Meditation Videos' },
+  { id:1, screen:'screen-f1', icon:`<img src="${ICON_IMG.feather}" alt=""/>`, nameId:'The Gentle Breath', nameEn:'The Gentle Breath', color:'green', subId:'Nafas yang Memulihkan', subEn:'3 Breathing Affirmations' },
+  { id:2, screen:'screen-f2', icon:`<img src="${ICON_IMG.sunCloud}" alt=""/>`, nameId:"Dawn Dew & Mom's Grace", nameEn:"Dawn Dew & Mom's Grace", color:'orange', subId:'Fajar & Kelembutan Ibu', subEn:'7 Morning Affirmations' },
+  { id:3, screen:'screen-f3', icon:`<img src="${ICON_IMG.heartHand}" alt=""/>`, nameId:"The Silent Embrace", nameEn:"Silent Embrace of Mom's Soul", color:'green', subId:'Dekap yang Tak Bersuara', subEn:'7 Soul Meditation Videos' },
   { id:4, screen:'screen-f4', icon:'📊', nameId:'Research Data', nameEn:'Research Data', color:'orange', subId:'Data Penelitian Ibu', subEn:'Research Participant Data', adminOnly:true },
-  { id:5, screen:'screen-f5', icon:SVG_ICONS.chatNote, nameId:"Mom's Feedback", nameEn:"Mom's Feedback Corner", color:'green', subId:'Pojok Cerita Bunda', subEn:"Share Your Story" },
+  { id:5, screen:'screen-f5', icon:`<img src="${ICON_IMG.chatNote}" alt=""/>`, nameId:"Mom's Feedback", nameEn:"Mom's Feedback Corner", color:'green', subId:'Pojok Cerita Bunda', subEn:"Share Your Story" },
   { id:6, screen:'screen-f6', icon:'🖼️', nameId:'Galeri Penelitian', nameEn:'Research Gallery', color:'orange', subId:'Foto & Dokumentasi', subEn:'Photos & Documentation', adminOnly:true },
   { id:7, screen:'screen-f7', icon:'👤', nameId:'Manajemen Akun', nameEn:'Account Management', color:'green', subId:'Admin & Viewer', subEn:'Admin & Viewer', adminOnly:true },
+  { id:8, screen:'screen-about', icon:'ℹ️', nameId:'Tentang Aplikasi', nameEn:'About the App', color:'orange', subId:'Kenali ArdiaMindly', subEn:'Get to know ArdiaMindly' },
 ];
 
 // ── LANG ──

@@ -67,6 +67,9 @@ body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);m
 
 /* ── HOME SCREEN ── */
 #screen-home{padding-top:0}
+.brand-banner{display:flex;align-items:center;justify-content:center;gap:8px;padding:18px 20px 8px;background:var(--cream)}
+.brand-leaf{width:22px;height:22px;color:var(--orange);flex-shrink:0}
+.brand-name{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--orange);letter-spacing:.2px}
 .home-header{background:linear-gradient(135deg,#6dbf96 0%,#85d0aa 100%);padding:28px 20px 36px;position:relative;overflow:hidden}
 .home-header::after{content:'';position:absolute;bottom:-20px;left:0;right:0;height:40px;background:var(--cream);border-radius:20px 20px 0 0}
 .home-greeting{color:rgba(255,255,255,.75);font-size:13px;margin-bottom:4px}
@@ -81,8 +84,9 @@ body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);m
 .feature-card.green::before{background:var(--green)}
 .feature-card.orange::before{background:var(--orange)}
 .feature-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:12px}
-.feature-icon.green{background:var(--green-light)}
-.feature-icon.orange{background:var(--orange-light)}
+.feature-icon svg{width:24px;height:24px}
+.feature-icon.green{background:var(--green-light);color:var(--green);--feather-line:var(--green-light)}
+.feature-icon.orange{background:var(--orange-light);color:var(--orange);--feather-line:var(--orange-light)}
 .feature-num{font-size:10px;font-weight:800;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
 .feature-name{font-size:13px;font-weight:800;color:var(--text);line-height:1.3}
 .feature-name-en{font-size:11px;color:var(--text3);margin-top:2px;font-style:italic}
@@ -98,7 +102,8 @@ body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);m
 /* ── FEATURE SCREEN ── */
 .feature-header{padding:80px 20px 20px;background:linear-gradient(135deg,#6dbf96,#85d0aa);position:sticky;top:0;z-index:5}
 .feature-header.orange-grad{background:linear-gradient(135deg,#c8824a,#e8a96a)}
-.feature-header h2{font-family:'Playfair Display',serif;color:#fff;font-size:22px;font-weight:700}
+.feature-header h2{font-family:'Playfair Display',serif;color:#fff;font-size:22px;font-weight:700;display:flex;align-items:center;gap:10px}
+.header-icon-svg{width:26px;height:26px;flex-shrink:0}
 .feature-header p{color:rgba(255,255,255,.75);font-size:13px;margin-top:6px;line-height:1.5}
 .feature-body{padding:20px 16px 100px}
 
@@ -176,6 +181,23 @@ tr:hover td{background:#f8fdf9}
 
 /* ── QR SCREEN ── */
 #screen-qr{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px}
+
+/* ── ABOUT SCREEN ── */
+.about-banner{background:linear-gradient(135deg,#6dbf96 0%,#85d0aa 100%);padding:80px 20px 32px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.about-banner .brand-leaf{width:32px;height:32px;color:#fff}
+.about-banner .brand-name{color:#fff}
+.about-tagline{color:rgba(255,255,255,.85);font-size:13px;font-style:italic;margin-top:2px}
+.lang-pill-toggle{display:flex;gap:8px;margin-bottom:18px}
+.lang-pill{flex:1;padding:10px 8px;border-radius:10px;font-size:12px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;border:1.5px solid var(--card-border, #e8ede9);background:#fff;color:var(--text2)}
+.lang-pill.active{background:var(--green);border-color:var(--green);color:#fff}
+.about-card{background:#fff;border-radius:var(--radius-sm);padding:18px 16px;box-shadow:var(--shadow);margin-bottom:16px}
+.about-card p{font-size:14px;line-height:1.7;color:var(--text2);margin-bottom:14px}
+.about-card p:last-child{margin-bottom:0}
+.about-card strong{color:var(--text);font-weight:800}
+.about-quote-card{background:#fff;border-radius:var(--radius-sm);padding:20px 18px;box-shadow:var(--shadow);position:relative}
+.about-quote-mark{position:absolute;top:10px;left:16px;font-family:'Playfair Display',serif;font-size:42px;color:var(--orange-light);line-height:1;font-weight:700}
+.about-quote-title{display:flex;align-items:center;gap:8px;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:10px;position:relative;z-index:1}
+.about-quote-text{font-size:13px;font-style:italic;color:var(--text2);border-top:1px solid var(--orange-light);padding-top:12px}
 #qr-img{width:220px;height:220px;border:4px solid var(--green);border-radius:16px;margin:20px 0}
 
 /* ── USERS ── */
@@ -292,6 +314,10 @@ tr:hover td{background:#f8fdf9}
 
 <!-- HOME -->
 <div class="screen" id="screen-home">
+  <div class="brand-banner">
+    <svg class="brand-leaf" viewBox="0 0 24 24" fill="none"><path d="M12 2c4 0 7 3.5 7 8 0 5-3.5 9-7 11-3.5-2-7-6-7-11 0-4.5 3-8 7-8z" fill="currentColor"/><path d="M12 4.5C9 6 7 9 7 12.5" stroke="rgba(255,255,255,.35)" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <span class="brand-name">ArdiaMindly</span>
+  </div>
   <div class="home-header">
     <div class="home-greeting" id="home-greeting">Selamat datang,</div>
     <div class="home-title" id="home-title">ArdiaMindly 🌿</div>
@@ -304,8 +330,8 @@ tr:hover td{background:#f8fdf9}
 <!-- FITUR 1: THE GENTLE BREATH -->
 <div class="screen" id="screen-f1">
   <div class="feature-header">
-    <h2>🌬️ The Gentle Breath</h2>
-    <p id="f1-desc-sub">Afirmasi napas lembut untuk menenangkan jiwa</p>
+    <h2><svg class="header-icon-svg" viewBox="0 0 24 24" fill="none"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" fill="#fff"/><line x1="16" y1="8" x2="2" y2="22" stroke="rgba(0,0,0,.25)" stroke-width="1.4" stroke-linecap="round"/><path d="M17.5 15H9" stroke="rgba(0,0,0,.25)" stroke-width="1.4" stroke-linecap="round"/></svg> The Gentle Breath</h2>
+    <p id="f1-desc-sub">— saat tubuh lelah, tarik napas pelan —</p>
   </div>
   <div class="feature-body">
     <div class="slideshow" id="f1-slideshow">
@@ -330,8 +356,8 @@ tr:hover td{background:#f8fdf9}
 <!-- FITUR 2: DAWN DEW & MOMS GRACE -->
 <div class="screen" id="screen-f2">
   <div class="feature-header orange-grad">
-    <h2>🌅 Dawn Dew & Mom's Grace</h2>
-    <p id="f2-desc-sub">7 afirmasi pagi untuk memulai hari dengan penuh kasih</p>
+    <h2><svg class="header-icon-svg" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.4" fill="#fff"/><path d="M9 2.3v1.6M9 11.5v1.6M3.7 8H2.3M15.7 8h-1.4M4.9 3.9l1.1 1.1M12 3.9l-1.1 1.1" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><path d="M6 20a3.6 3.6 0 0 1 .3-7.2 4.6 4.6 0 0 1 8.7-1.4A3.8 3.8 0 0 1 18.5 18a3.7 3.7 0 0 1-3.5 2z" fill="#fff"/></svg> Dawn Dew & Mom's Grace</h2>
+    <p id="f2-desc-sub">— secercah cahaya di pagi yang sunyi —</p>
   </div>
   <div class="feature-body">
     <div class="slideshow" id="f2-slideshow">
@@ -356,8 +382,8 @@ tr:hover td{background:#f8fdf9}
 <!-- FITUR 3: THE SILENT EMBRACE -->
 <div class="screen" id="screen-f3">
   <div class="feature-header">
-    <h2>🤍 The Silent Embrace of Mom's Soul</h2>
-    <p id="f3-desc-sub">Pelukan batin yang menyentuh jiwa setiap ibu</p>
+    <h2><svg class="header-icon-svg" viewBox="0 0 24 24" fill="none"><path d="M12 5.2c1-1.6 3.4-1.9 4.7-.6 1.4 1.4 1.3 3.5-.3 5L12 14 7.6 9.6c-1.6-1.5-1.7-3.6-.3-5 1.3-1.3 3.7-1 4.7.6z" fill="#fff"/><path d="M3 15.5h4.2c.6 0 1.1.2 1.6.6l1.7 1.3c.8.6.8 1.8-.1 2.3-.5.3-1.1.3-1.6 0l-2.3-1.3" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14.6h2.6c2 0 3 .5 4.4 1.6l2 1.5c1.2.9 2.9.6 4-.6L21 11.8" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> The Silent Embrace of Mom's Soul</h2>
+    <p id="f3-desc-sub">— pelukan yang selalu ada meski tak terlihat —</p>
   </div>
   <div class="feature-body">
     <div class="slideshow" id="f3-slideshow">
@@ -399,8 +425,8 @@ tr:hover td{background:#f8fdf9}
 <!-- FITUR 5: FEEDBACK -->
 <div class="screen" id="screen-f5">
   <div class="feature-header">
-    <h2>💬 Mom's Feedback Corner</h2>
-    <p id="f5-desc-sub">Bagikan pengalaman Anda menggunakan aplikasi ini</p>
+    <h2><svg class="header-icon-svg" viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8A2.5 2.5 0 0 1 17.5 16H10l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 13.5z" fill="#fff"/><circle cx="8.5" cy="9.5" r="1" fill="var(--green2,#85d0aa)"/><circle cx="12" cy="9.5" r="1" fill="var(--green2,#85d0aa)"/><circle cx="15.5" cy="9.5" r="1" fill="var(--green2,#85d0aa)"/></svg> Mom's Feedback Corner</h2>
+    <p id="f5-desc-sub">— ruang untuk suara hatimu didengar —</p>
   </div>
   <div class="feature-body">
     <div class="desc-box">
@@ -471,7 +497,8 @@ tr:hover td{background:#f8fdf9}
         <div style="font-weight:800;font-size:20px;font-family:'Playfair Display',serif" id="viewer-name">Nama</div>
         <span class="role-badge viewer" id="viewer-role" style="margin-top:8px">👁️ Viewer</span>
         <p style="color:var(--text3);font-size:13px;margin-top:16px;line-height:1.6">Anda dapat berbagi cerita dan pengalaman melalui Mom's Feedback Corner.</p>
-        <button class="btn-danger" style="width:100%;margin-top:24px;padding:12px" onclick="showExitConfirm()">Keluar</button>
+        <button class="btn-secondary" style="width:100%;margin-top:12px;padding:12px" onclick="goScreen('screen-about')">ℹ️ Tentang Aplikasi</button>
+        <button class="btn-danger" style="width:100%;margin-top:10px;padding:12px" onclick="showExitConfirm()">Keluar</button>
       </div>
     </div>
 
@@ -490,8 +517,9 @@ tr:hover td{background:#f8fdf9}
       </div>
       <div class="section-title">Daftar Pengguna</div>
       <div class="user-list" id="user-list"></div>
-      <div style="margin-top:20px;text-align:center">
+      <div style="margin-top:20px;text-align:center;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
         <button class="btn-secondary" onclick="goScreen('screen-qr')">📱 Lihat QR Code Aplikasi</button>
+        <button class="btn-secondary" onclick="goScreen('screen-about')">ℹ️ Tentang Aplikasi</button>
       </div>
     </div>
 
@@ -507,6 +535,40 @@ tr:hover td{background:#f8fdf9}
     <p style="margin-top:16px;font-size:12px;color:var(--text3)">Atau bagikan link:</p>
     <div style="background:var(--green-light);border-radius:10px;padding:10px 16px;margin-top:8px;word-break:break-all;font-size:12px;color:var(--green);font-weight:700" id="app-url"></div>
     <button class="btn-secondary" style="margin-top:12px" onclick="copyUrl()">📋 Salin Link</button>
+  </div>
+</div>
+
+<!-- ABOUT SCREEN -->
+<div class="screen" id="screen-about">
+  <div class="about-banner">
+    <svg class="brand-leaf" viewBox="0 0 24 24" fill="none"><path d="M12 2c4 0 7 3.5 7 8 0 5-3.5 9-7 11-3.5-2-7-6-7-11 0-4.5 3-8 7-8z" fill="currentColor"/><path d="M12 4.5C9 6 7 9 7 12.5" stroke="rgba(255,255,255,.35)" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <span class="brand-name" style="font-size:26px">ArdiaMindly</span>
+    <p class="about-tagline">A Mindful Companion for Postpartum Moms</p>
+  </div>
+  <div class="feature-body">
+    <div class="lang-pill-toggle">
+      <button type="button" class="lang-pill active" id="about-pill-id" onclick="setAboutLang('id')">🇮🇩 Bahasa Indonesia</button>
+      <button type="button" class="lang-pill" id="about-pill-en" onclick="setAboutLang('en')">🇬🇧 English</button>
+    </div>
+
+    <div class="about-card" id="about-text-id">
+      <p><strong>ArdiaMindly</strong> adalah aplikasi mindfulness untuk mendukung kesehatan mental ibu setelah melahirkan, terutama yang kembali bekerja. Aplikasi ini menggunakan dua bahasa (Inggris-Indonesia) dan fokus pada <strong>efikasi diri, penerimaan diri, serta keseimbangan peran</strong>.</p>
+      <p>ArdiaMindly berfungsi sebagai alat intervensi mandiri untuk membantu ibu mengelola <strong>stres ganda, kecemasan akibat perpisahan dengan bayi, dan kelelahan fisik mental</strong>. Aplikasi ini juga menyediakan materi edukasi singkat untuk mengatasi <strong>rasa bersalah (mom's guilt)</strong> yang umum dialami ibu bekerja.</p>
+    </div>
+
+    <div class="about-card" id="about-text-en" style="display:none">
+      <p><strong>ArdiaMindly</strong> is a mindfulness-based app designed to support maternal mental health during the postpartum transition, especially for mothers returning to work. It uses dual languages (English and Indonesian) and focuses on <strong>self-efficacy, self-acceptance, and role balance</strong>.</p>
+      <p>The app serves as a self-help intervention tool to help mothers manage <strong>dual-role stress, separation anxiety, and physical and mental exhaustion</strong>. It also provides short educational materials to address <strong>mom's guilt</strong> commonly experienced by working mothers.</p>
+    </div>
+
+    <div class="about-quote-card">
+      <div class="about-quote-mark">"</div>
+      <div class="about-quote-title">
+        <svg viewBox="0 0 24 24" fill="none" style="width:18px;height:18px;color:var(--green);flex-shrink:0"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" fill="currentColor"/></svg>
+        <span id="about-quote-title-text">Nafas yang Memulihkan</span>
+      </div>
+      <p class="about-quote-text" id="about-quote-text">"Ibu, ambillah waktu sejenak untuk kembali pada napasmu."</p>
+    </div>
   </div>
 </div>
 
@@ -625,7 +687,7 @@ tr:hover td{background:#f8fdf9}
     <span class="bnav-label" id="bnav-home-label">Beranda</span>
   </button>
   <button class="bnav-item" onclick="goTab('screen-f5')" id="bnav-fb">
-    <span class="bnav-icon">💬</span>
+    <span class="bnav-icon">📝</span>
     <span class="bnav-label">Feedback</span>
   </button>
   <button class="bnav-item" onclick="goTab('screen-f7')" id="bnav-akun">
@@ -651,7 +713,7 @@ const T = {
     loginSub: 'Masuk ke aplikasi',
     labelNama: 'Nama', labelSandi: 'Sandi', btnMasuk: 'Masuk',
     loginFooter: 'Admin default: Admin / admin123',
-    f5Sub: 'Bagikan pengalaman Anda menggunakan aplikasi ini',
+    f5Sub: '— ruang untuk suara hatimu didengar —',
     f5Desc: 'Ceritakan pengalaman Anda selama merawat anak dan rasakan perubahan setelah menggunakan ArdiaMindly. Setiap cerita Anda sangat berarti!',
     labelNamaIbu: 'Nama Ibu', labelPengalaman: 'Ceritakan Pengalaman Selama Menjaga Anak',
     labelPerasaan: 'Yang Dirasakan Setelah Menggunakan Aplikasi',
@@ -664,19 +726,26 @@ const T = {
     loginSub: 'Sign in to the app',
     labelNama: 'Name', labelSandi: 'Password', btnMasuk: 'Sign In',
     loginFooter: 'Default admin: Admin / admin123',
-    f5Sub: 'Share your experience using this app',
+    f5Sub: '— a space for your voice to be heard —',
     f5Desc: 'Tell us about your experience caring for your child and the changes you felt after using ArdiaMindly. Every story matters!',
     labelNamaIbu: "Mother's Name", labelPengalaman: 'Your Experience Caring for Your Child',
     labelPerasaan: 'How You Feel After Using the App',
   }
 };
 
+const SVG_ICONS = {
+  feather: `<svg viewBox="0 0 24 24" fill="none"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" fill="currentColor"/><line x1="16" y1="8" x2="2" y2="22" stroke="var(--feather-line, #fff)" stroke-width="1.6" stroke-linecap="round"/><path d="M17.5 15H9" stroke="var(--feather-line, #fff)" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+  sunCloud: `<svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.4" fill="currentColor"/><path d="M9 2.3v1.6M9 11.5v1.6M3.7 8H2.3M15.7 8h-1.4M4.9 3.9l1.1 1.1M12 3.9l-1.1 1.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M6 20a3.6 3.6 0 0 1 .3-7.2 4.6 4.6 0 0 1 8.7-1.4A3.8 3.8 0 0 1 18.5 18a3.7 3.7 0 0 1-3.5 2z" fill="currentColor"/></svg>`,
+  heartHand: `<svg viewBox="0 0 24 24" fill="none"><path d="M12 5.2c1-1.6 3.4-1.9 4.7-.6 1.4 1.4 1.3 3.5-.3 5L12 14 7.6 9.6c-1.6-1.5-1.7-3.6-.3-5 1.3-1.3 3.7-1 4.7.6z" fill="currentColor"/><path d="M3 15.5h4.2c.6 0 1.1.2 1.6.6l1.7 1.3c.8.6.8 1.8-.1 2.3-.5.3-1.1.3-1.6 0l-2.3-1.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14.6h2.6c2 0 3 .5 4.4 1.6l2 1.5c1.2.9 2.9.6 4-.6L21 11.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  chatNote: `<svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8A2.5 2.5 0 0 1 17.5 16H10l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 13.5z" fill="currentColor"/><circle cx="8.5" cy="9.5" r="1" fill="var(--feather-line,#fff)"/><circle cx="12" cy="9.5" r="1" fill="var(--feather-line,#fff)"/><circle cx="15.5" cy="9.5" r="1" fill="var(--feather-line,#fff)"/></svg>`,
+};
+
 const FEATURES = [
-  { id:1, screen:'screen-f1', icon:'🌬️', nameId:'The Gentle Breath', nameEn:'The Gentle Breath', color:'green', subId:'3 Video Olah Napas Tenang', subEn:'3 Breathing Affirmations' },
-  { id:2, screen:'screen-f2', icon:'🌅', nameId:"Dawn Dew & Mom's Grace", nameEn:"Dawn Dew & Mom's Grace", color:'orange', subId:'7 Video Afirmasi Pagi', subEn:'7 Morning Affirmations' },
-  { id:3, screen:'screen-f3', icon:'🤍', nameId:"The Silent Embrace", nameEn:"Silent Embrace of Mom's Soul", color:'green', subId:'7 Video Afirmasi Malam', subEn:'7 Soul Meditation Videos' },
+  { id:1, screen:'screen-f1', icon:SVG_ICONS.feather, nameId:'The Gentle Breath', nameEn:'The Gentle Breath', color:'green', subId:'Nafas yang Memulihkan', subEn:'3 Breathing Affirmations' },
+  { id:2, screen:'screen-f2', icon:SVG_ICONS.sunCloud, nameId:"Dawn Dew & Mom's Grace", nameEn:"Dawn Dew & Mom's Grace", color:'orange', subId:'Fajar & Kelembutan Ibu', subEn:'7 Morning Affirmations' },
+  { id:3, screen:'screen-f3', icon:SVG_ICONS.heartHand, nameId:"The Silent Embrace", nameEn:"Silent Embrace of Mom's Soul", color:'green', subId:'Dekap yang Tak Bersuara', subEn:'7 Soul Meditation Videos' },
   { id:4, screen:'screen-f4', icon:'📊', nameId:'Research Data', nameEn:'Research Data', color:'orange', subId:'Data Penelitian Ibu', subEn:'Research Participant Data', adminOnly:true },
-  { id:5, screen:'screen-f5', icon:'💬', nameId:"Mom's Feedback Corner", nameEn:"Mom's Feedback Corner", color:'green', subId:'Cerita & Pengalaman Ibu', subEn:"Share Your Story" },
+  { id:5, screen:'screen-f5', icon:SVG_ICONS.chatNote, nameId:"Mom's Feedback", nameEn:"Mom's Feedback Corner", color:'green', subId:'Pojok Cerita Bunda', subEn:"Share Your Story" },
   { id:6, screen:'screen-f6', icon:'🖼️', nameId:'Galeri Penelitian', nameEn:'Research Gallery', color:'orange', subId:'Foto & Dokumentasi', subEn:'Photos & Documentation', adminOnly:true },
   { id:7, screen:'screen-f7', icon:'👤', nameId:'Manajemen Akun', nameEn:'Account Management', color:'green', subId:'Admin & Viewer', subEn:'Admin & Viewer', adminOnly:true },
 ];
@@ -786,6 +855,7 @@ function updateNavbar(screenId) {
     'screen-f6':'Galeri Penelitian',
     'screen-f7':'Manajemen Akun',
     'screen-qr':'QR Code',
+    'screen-about':'Tentang Aplikasi',
   };
   document.getElementById('nav-title').textContent = titles[screenId] || 'ArdiaMindly';
 }
@@ -1439,6 +1509,23 @@ async function loadQR() {
 
 function copyUrl() {
   navigator.clipboard.writeText(window.location.origin).then(()=>toast('✅ Link disalin!')).catch(()=>toast('⚠️ Tidak bisa menyalin'));
+}
+
+// ── ABOUT ──
+function setAboutLang(l) {
+  document.getElementById('about-pill-id').classList.toggle('active', l==='id');
+  document.getElementById('about-pill-en').classList.toggle('active', l==='en');
+  document.getElementById('about-text-id').style.display = l==='id' ? 'block' : 'none';
+  document.getElementById('about-text-en').style.display = l==='en' ? 'block' : 'none';
+  const quoteTitle = document.getElementById('about-quote-title-text');
+  const quoteText = document.getElementById('about-quote-text');
+  if(l==='id') {
+    quoteTitle.textContent = 'Nafas yang Memulihkan';
+    quoteText.textContent = '"Ibu, ambillah waktu sejenak untuk kembali pada napasmu."';
+  } else {
+    quoteTitle.textContent = 'The Gentle Breath';
+    quoteText.textContent = '"Mom, take a moment to return to your breath."';
+  }
 }
 
 // ── MODAL ──
